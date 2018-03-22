@@ -38,6 +38,45 @@ class Block(implements(GenericBlock)):
         return "This should work"
 
 
+class GenericNode(Interface):
+    def method(self):
+        pass
+
+class Node(Interface):
+    def method(self):
+        pass
+
+
+class GenericHeader(Interface):
+    def method(self):
+        pass
+
+class Header(Interface):
+    def method(self):
+        pass
+
+
+class GenericPayload(Interface):
+    def method(self):
+        pass
+
+class Payload(Interface):
+    def method(self):
+        pass
+
+
+class GenericTransaction(Interface):
+    def method(self):
+        pass
+
+class Transaction(Interface):
+    def method(self):
+        pass
+
+
+
+
+
 b = Block()
 
 print(b.method(4,4))
