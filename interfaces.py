@@ -64,6 +64,7 @@ class Block(implements(GenericBlock)):
         return "This should work"
 
 
+<<<<<<< HEAD:iterfaceses.py
 
 
 class Transaction():
@@ -79,6 +80,48 @@ class TransOUT():
 h = BlockHeader(0, "dfsfisd", 1318320, 1, 0)
 
 b = Block(h)
+=======
+class GenericNode(Interface):
+    def method(self):
+        pass
+
+class Node(Interface):
+    def method(self):
+        pass
+
+
+class GenericHeader(Interface):
+    def method(self):
+        pass
+
+class Header(Interface):
+    def method(self):
+        pass
+
+
+class GenericPayload(Interface):
+    def method(self):
+        pass
+
+class Payload(Interface):
+    def method(self):
+        pass
+
+
+class GenericTransaction(Interface):
+    def method(self):
+        pass
+
+class Transaction(Interface):
+    def method(self):
+        pass
+
+
+
+
+
+b = Block()
+>>>>>>> fb43c9fb46ff3c7e088f2a66017305f7a6d33dcf:interfaces.py
 
 print(b.method(4,4))
 
