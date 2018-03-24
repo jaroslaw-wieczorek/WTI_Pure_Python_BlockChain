@@ -146,6 +146,9 @@ class Node(implements(GenericNode)):
     def __init__(self):
         self.blockchain = [self.first_block]
 
+    def getBlockchain(self):
+        return self.blockchain
+
     def getCurrentTimestamp(self):
         return datetime.datetime.now().replace(tzinfo=timezone.utc).timestamp()
     def getLatestBlock(self):
@@ -163,6 +166,24 @@ class Node(implements(GenericNode)):
         newBlockHeader = BlockHeader(nextIndex, previousBlock.hash, nextTimestamp, "diff", "nonce",); #TO_DO add difficulty and nonce magic!
         return newBlockHeader
 
+
+    def getDifficulty(self, aBlockchain):
+        latestBlock= aBlockchain[self.blockchain.length - 1]
+        if latestBlock.index % self.DIFFICULTY_ADJUSTMENT_INTERVAL == 0 & isinstance(int,latestBlock.index % self.DIFFICULTY_ADJUSTMENT_INTERVAL) & isinstance(int,latestBlock.index) & latestBlock.index != 0:
+            return self.getAdjustedDifficulty(latestBlock, aBlockchain)
+        else:
+            return latestBlock.difficulty
+
+    def getAdjustedDifficulty(self, latestBlock, aBlockchain):
+            prevAdjustmentBlock = aBlockchain[self.blockchain.length - self.DIFFICULTY_ADJUSTMENT_INTERVAL]
+            timeExpected = self.BLOCK_GENERATION_INTERVAL * self.DIFFICULTY_ADJUSTMENT_INTERVAL
+            timeTaken = latestBlock.timestamp - prevAdjustmentBlock.timestamp
+            if timeTaken < timeExpected / 2:
+                return prevAdjustmentBlock.difficulty + 1
+            elif timeTaken > timeExpected * 2:
+                return prevAdjustmentBlock.difficulty - 1
+            else:
+                return prevAdjustmentBlock.difficulty;
 
 
 # Tests
