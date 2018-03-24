@@ -7,7 +7,7 @@ Created on Thu Mar 22 11:38:34 2018
 """
 import datetime
 from interface import implements, Interface
-
+import hashlib
 
 class UI(Interface):
     
@@ -34,6 +34,101 @@ class GenericNode(Interface):
         pass
 
 
+
+
+class GenericBlockHeader(Interface):
+    def __init__(self, index, previousHash, timestamp, difficulty, nonce):
+        pass
+    
+        
+        
+class BlockHeader(implements(GenericBlockHeader)):
+    def __init__(self, index, previousHash, timestamp, difficulty, nonce):
+        self.index = index
+        self.previousHash = previousHash
+        self.timestamp = timestamp
+        self.difficulty = difficulty
+        self.nonce = nonce
+        
+    def __repr__(self):
+        return str(self.__dict__)
+
+
+class GenericBlockPayload(Interface):
+    def __init__(self, data):
+        pass
+
+
+class BlockPayload(implements(GenericBlockPayload)):
+    def __init__(self, data):
+        self.data = data
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+
+class GenericBlock(Interface):
+    
+    def __init__(self, blockHeader, blockPayload):
+        self.blockHeader = blockHeader
+        self.blockPayload = blockPayload
+        self.currentHash = None
+
+       # number, currentHash, previousHash, timestamp, Transaction, difficulty, number
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+    
+
+class Block(implements(GenericBlock)):
+    
+    def __init__(self, blockHeader, blockPayload):
+
+        self.blockHeader = blockHeader
+        self.blockPayload = blockPayload
+        self.currentHash = None
+
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+
+
+
+class GenericTransaction(Interface):
+    def __init__(self, transID, transIN, transOUT):
+        pass
+
+
+class Transaction(implements(GenericTransaction)):
+    def __init__(self, transID, transIN, transOUT):
+        self.transID = transID
+        self.transIN = transIN
+        self.transOUT = transOUT
+        
+    def __repr__(self):
+        return str(self.__dict__)
+
+
+class TransIN():
+    def __init__(self, transOutId,  transOutIndex, signature):
+        self.transOutId = transOutId
+        self.transOutIndex = transOutIndex
+        self.signature = signature
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+class TransOUT():
+    def __init__(self, address, amount):
+        self.address = address
+        self.amount = amount
+
+    def __repr__(self):
+        return str(self.__dict__)
+
+
 class Node(implements(GenericNode)):
     #Constant variables:
     #Firsttransaction
@@ -53,6 +148,11 @@ class Node(implements(GenericNode)):
     def getLatestBlock(self):
         return self.blockchain[-1]
 
+    def calculateHash(self, BlockHeader, BlockPayload):
+        h = hashlib.new('sha256')
+        h.update(str({BlockHeader, BlockPayload}).encode("utf-8"))
+        return h.hexdigest()
+
     def generateNextBlockHeader(self):
         previousBlock = self.getLatestBlock();
         nextIndex = previousBlock.index + 1;
@@ -62,84 +162,22 @@ class Node(implements(GenericNode)):
 
 
 
-class GenericBlockHeader(Interface):
-    def __init__(self, index, previousHash, timestamp, difficulty, nonce):
-        pass
-    
-        
-        
-class BlockHeader(implements(GenericBlockHeader)):
-    def __init__(self, index, previousHash, timestamp, difficulty, nonce):
-        self.index = index
-        self.previousHash = previousHash
-        self.timestamp = timestamp
-        self.difficulty = difficulty
-        self.nonce = nonce
-        
-        
-class GenericBlockPayload(Interface):
-    def __init__(self, data):
-        pass
+# Tests
 
+txIN = TransIN(1,2,"signaure")
+txOUT = TransOUT("ADRES_WALLETA",50)
 
-class BlockPayload(implements(GenericBlockPayload)):
-    def __init__(self, data):
-        self.data = data
-        
-        
-        
-
-class GenericBlock(Interface):
-    
-    def __init__(self, BlockHeader, BlockPayload):
-        
-          # number, currentHash, previousHash, timestamp, Transaction, difficulty, number
-          pass
-        
-    def method(self, a, b):
-        pass
-    
-
-class Block(implements(GenericBlock)):
-    def __init__(self, BlockHeader, BlockPayload):
-        pass
-    
-    def method(self, a, b):
-        return "This should work"
-
-
-class GenericTransaction(Interface):
-    def __init__(self, transID, transIN, transOUT):
-        pass
-
-
-class Transaction(implements(GenericTransaction)):
-    def __init__(self, transID, transIN, transOUT):
-        self.transID = transID
-        self.transIN = transIN
-        self.transOUT = transOUT
-        
-
-class TransIN():
-    def __init__(self):
-        pass
-
-class TransOUT():
-    def __init__(self):
- 
-        pass
-
-    
-t = Transaction(1,None,None)
+t = Transaction(1, txIN, txOUT)
+print(t)
 
 p = BlockPayload(t)
-
 
 h = BlockHeader(0, "dfsfisd", 1318320, 1, 0)
 
 b = Block(h,p)
 
-print(b.method(4,4))
+n = Node()
+print(n.calculateHash(h,p))
 
 w = Wallet(48348)
 Wallet(23)
