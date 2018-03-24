@@ -5,7 +5,7 @@ Created on Thu Mar 22 11:38:34 2018
 
 @author: afar
 """
-
+import datetime
 from interface import implements, Interface
 
 
@@ -35,10 +35,30 @@ class GenericNode(Interface):
 
 
 class Node(implements(GenericNode)):
-    first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(None))
+    #Constant variables:
+    #Firsttransaction
+    first_transaction = None #TO_DO add the first transaction!
+    #Firstblock
+    first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
+
+    #Diff:
+    #in seconds
+    BLOCK_GENERATION_INTERVAL = 10;
+    #in blocks
+    DIFFICULTY_ADJUSTMENT_INTERVAL = 10;
+
     def __init__(self):
         self.blockchain = [self.first_block]
 
+    def getLatestBlock(self):
+        return self.blockchain[-1]
+
+    def generateNextBlockHeader(self):
+        previousBlock = self.getLatestBlock();
+        nextIndex = previousBlock.index + 1;
+        nextTimestamp = str(datetime.datetime.now());
+        newBlockHeader = BlockHeader(nextIndex, previousBlock.hash, nextTimestamp, "diff", "nonce",); #TO_DO add difficulty and nonce magic!
+        return newBlockHeader;
 
 
 
