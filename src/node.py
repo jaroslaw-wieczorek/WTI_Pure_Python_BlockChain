@@ -54,15 +54,15 @@ class Node(implements(GenericNode)):
         return newBlockHeader
 
 
-    def getDifficulty(self, aBlockchain):
-        latestBlock= aBlockchain[self.blockchain.length - 1]
+    def getDifficulty(self):
+        latestBlock= self.blockchain[-1]
         if latestBlock.index % self.DIFFICULTY_ADJUSTMENT_INTERVAL == 0 & isinstance(int,latestBlock.index % self.DIFFICULTY_ADJUSTMENT_INTERVAL) & isinstance(int,latestBlock.index) & latestBlock.index != 0:
-            return self.getAdjustedDifficulty(latestBlock, aBlockchain)
+            return self.getAdjustedDifficulty(latestBlock)
         else:
             return latestBlock.difficulty
 
-    def getAdjustedDifficulty(self, latestBlock, aBlockchain):
-            prevAdjustmentBlock = aBlockchain[self.blockchain.length - self.DIFFICULTY_ADJUSTMENT_INTERVAL]
+    def getAdjustedDifficulty(self, latestBlock):
+            prevAdjustmentBlock = self.blockchain[len(self.blockchain) - self.DIFFICULTY_ADJUSTMENT_INTERVAL]
             timeExpected = self.BLOCK_GENERATION_INTERVAL * self.DIFFICULTY_ADJUSTMENT_INTERVAL
             timeTaken = latestBlock.timestamp - prevAdjustmentBlock.timestamp
             if timeTaken < timeExpected / 2:
