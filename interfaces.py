@@ -5,7 +5,7 @@ Created on Thu Mar 22 11:38:34 2018
 
 @author: afar
 """
-
+import datetime
 from interface import implements, Interface
 import hashlib
 
@@ -52,8 +52,8 @@ class BlockHeader(implements(GenericBlockHeader)):
         
     def __repr__(self):
         return str(self.__dict__)
-        
-        
+
+
 class GenericBlockPayload(Interface):
     def __init__(self, data):
         pass
@@ -62,10 +62,10 @@ class GenericBlockPayload(Interface):
 class BlockPayload(implements(GenericBlockPayload)):
     def __init__(self, data):
         self.data = data
-   
+
     def __repr__(self):
         return str(self.__dict__)
-        
+
 
 class GenericBlock(Interface):
     
@@ -73,9 +73,9 @@ class GenericBlock(Interface):
         self.blockHeader = blockHeader
         self.blockPayload = blockPayload
         self.currentHash = None
-  
+
        # number, currentHash, previousHash, timestamp, Transaction, difficulty, number
-         
+
     def __repr__(self):
         return str(self.__dict__)
 
@@ -84,12 +84,12 @@ class GenericBlock(Interface):
 class Block(implements(GenericBlock)):
     
     def __init__(self, blockHeader, blockPayload):
-       
+
         self.blockHeader = blockHeader
         self.blockPayload = blockPayload
         self.currentHash = None
-             
-          
+
+
     def __repr__(self):
         return str(self.__dict__)
 
@@ -109,14 +109,14 @@ class Transaction(implements(GenericTransaction)):
         
     def __repr__(self):
         return str(self.__dict__)
-        
+
 
 class TransIN():
     def __init__(self, transOutId,  transOutIndex, signature):
         self.transOutId = transOutId
         self.transOutIndex = transOutIndex
         self.signature = signature
-          
+
     def __repr__(self):
         return str(self.__dict__)
 
@@ -124,25 +124,46 @@ class TransOUT():
     def __init__(self, address, amount):
         self.address = address
         self.amount = amount
-          
+
     def __repr__(self):
         return str(self.__dict__)
-        
-        
+
+
 class Node(implements(GenericNode)):
-    first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(None))
+    #Constant variables:
+    #Firsttransaction
+    first_transaction = None #TO_DO add the first transaction!
+    #Firstblock
+    first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
+
+    #Diff:
+    #in seconds
+    BLOCK_GENERATION_INTERVAL = 10;
+    #in blocks
+    DIFFICULTY_ADJUSTMENT_INTERVAL = 10;
+
     def __init__(self):
         self.blockchain = [self.first_block]
 
+    def getLatestBlock(self):
+        return self.blockchain[-1]
+
     def calculateHash(self, BlockHeader, BlockPayload):
         h = hashlib.new('sha256')
-               
         h.update(str({BlockHeader, BlockPayload}).encode("utf-8"))
-        
         return h.hexdigest()
 
-# Tests 
-        
+    def generateNextBlockHeader(self):
+        previousBlock = self.getLatestBlock();
+        nextIndex = previousBlock.index + 1;
+        nextTimestamp = str(datetime.datetime.now());
+        newBlockHeader = BlockHeader(nextIndex, previousBlock.hash, nextTimestamp, "diff", "nonce",); #TO_DO add difficulty and nonce magic!
+        return newBlockHeader;
+
+
+
+# Tests
+
 txIN = TransIN(1,2,"signaure")
 txOUT = TransOUT("ADRES_WALLETA",50)
 
