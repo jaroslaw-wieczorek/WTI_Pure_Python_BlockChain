@@ -6,6 +6,7 @@ Created on Thu Mar 22 11:38:34 2018
 @author: afar
 """
 import datetime
+from datetime import timezone
 from interface import implements, Interface
 import hashlib
 
@@ -145,6 +146,8 @@ class Node(implements(GenericNode)):
     def __init__(self):
         self.blockchain = [self.first_block]
 
+    def getCurrentTimestamp(self):
+        return datetime.datetime.now().replace(tzinfo=timezone.utc).timestamp()
     def getLatestBlock(self):
         return self.blockchain[-1]
 
@@ -154,11 +157,11 @@ class Node(implements(GenericNode)):
         return h.hexdigest()
 
     def generateNextBlockHeader(self):
-        previousBlock = self.getLatestBlock();
-        nextIndex = previousBlock.index + 1;
-        nextTimestamp = str(datetime.datetime.now());
+        previousBlock = self.getLatestBlock()
+        nextIndex = previousBlock.index + 1
+        nextTimestamp = self.getCurrentTimestamp()
         newBlockHeader = BlockHeader(nextIndex, previousBlock.hash, nextTimestamp, "diff", "nonce",); #TO_DO add difficulty and nonce magic!
-        return newBlockHeader;
+        return newBlockHeader
 
 
 
