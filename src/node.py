@@ -48,11 +48,34 @@ class Node(implements(GenericNode)):
 
     def generateNextBlockHeader(self):
         previousBlock = self.getLatestBlock()
+        difficulty = self.getDifficulty()
+        nonce = 0
         nextIndex = previousBlock.index + 1
         nextTimestamp = self.getCurrentTimestamp()
-        newBlockHeader = BlockHeader(nextIndex, previousBlock.hash, nextTimestamp, "diff", "nonce",); #TO_DO add difficulty and nonce magic!
+        newBlockHeader = BlockHeader(nextIndex, previousBlock.hash, nextTimestamp, difficulty, nonce)
         return newBlockHeader
 
+    def generateNextBlockPayload(self, transactions): #TO_DO TRANSACTIONS AND PAYLOAD NOT YET IMPLEMENTED
+        pass
+
+    def findNextBlock(self,block):
+        while True:
+            nonce = 0
+            hash = self.calculateHash(block.blockHeader, block.blockPayload)
+            if self.hashDifficultyCheck(hash, block.blockHeader.difficulty):
+                block.blockHeader.nonce = nonce
+                block.currentHash = hash
+                return block
+            nonce += 1
+
+    def hashDifficultyCheck(self, hash, difficulty):
+        hashinbinary = bin(int(hash, 16))[2:].zfill(len(hash) * 4)
+        return hashinbinary.startswith('0'*difficulty)
+
+
+
+    def generateRawNextBlock(self,transactions):
+        newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(),self.generateNextBlockPayload(transactions)))
 
     def getDifficulty(self):
         latestBlock= self.blockchain[-1]
@@ -62,12 +85,12 @@ class Node(implements(GenericNode)):
             return latestBlock.difficulty
 
     def getAdjustedDifficulty(self, latestBlock):
-            prevAdjustmentBlock = self.blockchain[len(self.blockchain) - self.DIFFICULTY_ADJUSTMENT_INTERVAL]
-            timeExpected = self.BLOCK_GENERATION_INTERVAL * self.DIFFICULTY_ADJUSTMENT_INTERVAL
-            timeTaken = latestBlock.timestamp - prevAdjustmentBlock.timestamp
-            if timeTaken < timeExpected / 2:
-                return prevAdjustmentBlock.difficulty + 1
-            elif timeTaken > timeExpected * 2:
-                return prevAdjustmentBlock.difficulty - 1
-            else:
-                return prevAdjustmentBlock.difficulty;
+        prevAdjustmentBlock = self.blockchain[len(self.blockchain) - self.DIFFICULTY_ADJUSTMENT_INTERVAL]
+        timeExpected = self.BLOCK_GENERATION_INTERVAL * self.DIFFICULTY_ADJUSTMENT_INTERVAL
+        timeTaken = latestBlock.timestamp - prevAdjustmentBlock.timestamp
+        if timeTaken < timeExpected / 2:
+            return prevAdjustmentBlock.difficulty + 1
+        elif timeTaken > timeExpected * 2:
+            return prevAdjustmentBlock.difficulty - 1
+        else:
+            return prevAdjustmentBlock.difficulty
