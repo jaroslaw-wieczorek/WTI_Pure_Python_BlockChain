@@ -31,11 +31,9 @@ class Wallet(implements(UI)):
 
 class GenericBlockHeader(Interface):
     def __init__(self, index, previousHash, timestamp, difficulty, nonce):
-        self.index = index
-        self.previousHash = previousHash
-        self.timestamp = timestamp
-        self.difficulty = difficulty
-        self.nonce = nonce
+        pass
+    
+        
         
 class BlockHeader(implements(GenericBlockHeader)):
     def __init__(self, index, previousHash, timestamp, difficulty, nonce):
@@ -45,10 +43,23 @@ class BlockHeader(implements(GenericBlockHeader)):
         self.difficulty = difficulty
         self.nonce = nonce
         
+        
+class GenericBlockPayload(Interface):
+    def __init__(self, data):
+        pass
+
+
+class BlockPayload(implements(GenericBlockPayload)):
+    def __init__(self, data):
+        self.data = data
+        
+        
+        
 
 class GenericBlock(Interface):
     
-    def __init__(self, BlockHeader):
+    def __init__(self, BlockHeader, BlockPayload):
+        
           # number, currentHash, previousHash, timestamp, Transaction, difficulty, number
           pass
         
@@ -57,28 +68,43 @@ class GenericBlock(Interface):
     
 
 class Block(implements(GenericBlock)):
-    def __init__(self, BlockHeader):
+    def __init__(self, BlockHeader, BlockPayload):
         pass
     
     def method(self, a, b):
         return "This should work"
 
 
+class GenericTransaction(Interface):
+    def __init__(self, transID, transIN, transOUT):
+        pass
 
 
-class Transaction():
-    pass
+class Transaction(implements(GenericTransaction)):
+    def __init__(self, transID, transIN, transOUT):
+        self.transID = transID
+        self.transIN = transIN
+        self.transOUT = transOUT
+        
 
 class TransIN():
-    pass
+    def __init__(self):
+        pass
 
 class TransOUT():
-    pass
+    def __init__(self):
+ 
+        pass
 
     
+t = Transaction(1,None,None)
+
+p = BlockPayload(t)
+
+
 h = BlockHeader(0, "dfsfisd", 1318320, 1, 0)
 
-b = Block(h)
+b = Block(h,p)
 
 print(b.method(4,4))
 
