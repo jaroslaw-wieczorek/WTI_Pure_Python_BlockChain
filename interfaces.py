@@ -27,7 +27,20 @@ class Wallet(implements(UI)):
     
     def method_b(self):
         print("to działa")
-        
+
+
+class GenericNode(Interface):
+    def __init__(self):
+        pass
+
+
+class Node(implements(GenericNode)):
+    first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(None))
+    def __init__(self):
+        self.blockchain = [self.first_block]
+
+
+
 
 class GenericBlockHeader(Interface):
     def __init__(self, index, previousHash, timestamp, difficulty, nonce):
