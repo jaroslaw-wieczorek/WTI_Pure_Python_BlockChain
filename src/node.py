@@ -91,7 +91,24 @@ class Node(implements(GenericNode)):
                type(block.currentHash) is str &\
                type(block.blockPayload.data) is object
 
-    def isBlockValid(self, newBlock, previousBlock):
+    def isTimestampValid(self, newBlock, previousBlock):
+        return previousBlock.blockHeader.timestamp - 60 < newBlock.blockHeader.timestamp &\
+                newBlock.blockHeader.timestamp - 60 < self.getCurrentTimestamp()
+
+    def isNewBlockValid(self, newBlock, previousBlock):
+        if not self.isValidBlockStructure(newBlock):
+            print("invalid block structure")
+            return False
+        if previousBlock.blockHeader.index + 1 != newBlock.blockHeader.index:
+            print("invalid index")
+            return False
+        if previousBlock.currentHash != newBlock.blockHeader.previousHash:
+            print("invalid previous hash")
+            return False
+        #TO_DO
+
+
+
         pass #TO_DO
 
     def addBlockToChain(self, block):
