@@ -170,7 +170,7 @@ class Node(implements(GenericNode)):
         h=hashlib.sha256((txInContent+txOutContent).encode("utf-8"))
        # print(h.digest()) 
         print(h.hexdigest())      
-        return h.hexdigest()
+        return h.hexdigest() #return string 
     
     
     def signTransIN(self, transaction: Transaction, transInIndex: int, prvivateKey: str, uspentTransOut: list):
