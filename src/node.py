@@ -50,7 +50,7 @@ class Node(implements(GenericNode)):
 
     def calculateHash(self, BlockHeader, BlockPayload):
         h = hashlib.new('sha256')
-       
+
         h.update(bin(str(BlockHeader)+''+str(BlockPayload)).encode("utf-8"))
         return h.hexdigest()
 
@@ -80,10 +80,26 @@ class Node(implements(GenericNode)):
         hashinbinary = bin(int(hash, 16))[2:].zfill(len(hash) * 4)
         return hashinbinary.startswith('0'*difficulty)
 
+    def isValidBlockStructure(self, block):
+        return type(block.blockHeader) is BlockHeader &\
+               type(block.blockPayload) is BlockPayload &\
+               type(block.blockHeader.index) is int &\
+               type(block.blockHeader.previousHash) is str &\
+               type(block.blockHeader.timestamp) is float &\
+               type(block.blockHeader.difficulty) is int &\
+               type(block.blockHeader.nonce) is int &\
+               type(block.currentHash) is str &\
+               type(block.blockPayload.data) is object
 
+    def isBlockValid(self, newBlock, previousBlock):
+        pass #TO_DO
+
+    def addBlockToChain(self, block):
+        pass #TO_DO
 
     def generateRawNextBlock(self,transactions):
-        newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(),self.generateNextBlockPayload(transactions)))
+        newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))
+        #TO_DO
 
     def getDifficulty(self):
         latestBlock= self.blockchain[-1]
@@ -120,4 +136,4 @@ class Node(implements(GenericNode)):
             txOutContent += self.concOUT(x)
         
         print(hashlib.sha256((txInContent+txOutContent).encode("utf-8")).digest())      
-        return 
+        return
