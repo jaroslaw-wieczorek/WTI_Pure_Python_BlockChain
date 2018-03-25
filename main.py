@@ -10,7 +10,6 @@ Created on Thu Mar 22 11:38:34 2018
 import sys
 sys.path += ['src/generics']
 
-from src.wallet import Wallet
 from src.node import Node
 
 from src.transIN import TransIN
