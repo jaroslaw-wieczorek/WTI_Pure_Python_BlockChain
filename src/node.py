@@ -13,6 +13,8 @@ import hashlib
 from interface import implements 
 from src.generics.interfaces import GenericNode
 
+
+from src.wallet import Wallet
 from src.block import Block
 from src.transIN import TransIN
 from src.transOUT import TransOUT
@@ -21,6 +23,10 @@ from src.transaction import Transaction
 from src.blockHeader import BlockHeader
 from src.blockPayload import BlockPayload
 
+from Crypto.PublicKey import RSA 
+from Crypto.Signature import PKCS1_v1_5 
+from Crypto.Hash import SHA256 
+from base64 import b64encode, b64decode 
 
 
 
@@ -30,7 +36,8 @@ class Node(implements(GenericNode)):
     first_transaction = None #TO_DO add the first transaction!
     #Firstblock
     first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
-
+    
+     __key = open("ssh_keys/private", "r").read()     
     #Difficulty:
     #in seconds
     BLOCK_GENERATION_INTERVAL = 10;
@@ -171,6 +178,31 @@ class Node(implements(GenericNode)):
         return h.hexdigest() #return string 
     
     
-    def signTransIN(self, transaction: Transaction, transInIndex: int, prvivateKey: str, uspentTransOut: list):
+    def signTransIN(self, transaction: Transaction, transInIndex: int, prvivateKey: str, unspentsTransOuts: list):
+
         
+        transIn = transaction.transIN[transInIndex]
+        dataToSign = transaction.transID
+        
+        
+        #rsakey = RSA.importKey(key) 
+        #signer = PKCS1_v1_5.new(rsakey) 
+        #digest = SHA256.new() 
+        # It's being assumed the data is base64 encoded, so it's decoded before updating the digest 
+        #digest.update(b64decode(data)) 
+        #sign = signer.sign(digest) 
+        #     return b64encode(sign)
+        # refUnspentOutTrans = findUnspentOutTrans(transIn.transOutId, trans.transOutIndex, unspentsTransOuts)
+        # refAddress = refUnspentOutTrans.address;
+        # key =  
+        """
+        const txIn: TxIn = transaction.txIns[txInIndex];
+        const dataToSign = transaction.id;
+        const referencedUnspentTxOut: UnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts);
+        const referencedAddress = referencedUnspentTxOut.address;
+        const key = ec.keyFromPrivate(privateKey, 'hex');
+        const signature: string = toHexString(key.sign(dataToSign).toDER());
+        return signature;
+   
+        """
         return str
