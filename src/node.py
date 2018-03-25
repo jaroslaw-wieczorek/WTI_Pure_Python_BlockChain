@@ -37,7 +37,7 @@ class Node(implements(GenericNode)):
     #Firstblock
     first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
     
-    __key = open("ssh_keys/private", "r").read()
+    __key = open("rsa_keys/private", "r").read()
     
     #Difficulty:
     #in seconds
@@ -178,31 +178,37 @@ class Node(implements(GenericNode)):
         print(h.hexdigest())      
         return h.hexdigest() #return string 
     
+    def newUnspentOutTrans():
+        pass
     
-    def signTransIN(self, transaction: Transaction, transInIndex: int, prvivateKey: str, unspentsTransOuts: list):
-
-        
+    """
+    def findUnspentOutTrans(ransIn.transOutId, trans.transOutIndex, unspentsTransOuts):
+        pass
+    """
+    
+    def signTransIN(self, transaction: Transaction, transInIndex: int, unspentsTransOuts: list):
+        print(transaction)
+        print
+        print(transInIndex)
+        print
+        print(unspentsTransOuts)
+                
+        print
+                
+        print("###################")
         transIn = transaction.transIN[transInIndex]
-        dataToSign = transaction.transID
         
-        rsakey = RSA.importKey(self.__key) 
-        signer = PKCS1_v1_5.new(rsakey) 
-        digest = SHA256.new() 
-        # It's being assumed the data is base64 encoded, so it's decoded before updating the digest 
-        digest.update(b64decode(data)) 
-        sign = signer.sign(digest) 
-            #return b64encode(sign)
+        print(transIn)
+        print
+        dataToSign = str(transaction.transID)
+        print(dataToSign)
         # refUnspentOutTrans = findUnspentOutTrans(transIn.transOutId, trans.transOutIndex, unspentsTransOuts)
         # refAddress = refUnspentOutTrans.address;
-        # key =  
-        """
-        const txIn: TxIn = transaction.txIns[txInIndex];
-        const dataToSign = transaction.id;
-        const referencedUnspentTxOut: UnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts);
-        const referencedAddress = referencedUnspentTxOut.address;
-        const key = ec.keyFromPrivate(privateKey, 'hex');
-        const signature: string = toHexString(key.sign(dataToSign).toDER());
-        return signature;
-   
-        """
-        return str
+        rsakey = RSA.importKey(self.__key) 
+        signer = PKCS1_v1_5.new(rsakey) 
+        digest = SHA256.new()
+        # It's being assumed the data is base64 encoded, so it's decoded before updating the digest 
+        digest.update(dataToSign.encode("utf-8"))
+        sign = signer.sign(digest)
+        print(sign)
+        return sign
