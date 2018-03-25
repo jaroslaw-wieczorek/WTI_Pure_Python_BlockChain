@@ -39,5 +39,7 @@ b = Block(h,p)
 n = Node()
 n.getTransactionId(t)
 
+n.findNextBlock(b)
+
 w = Wallet(48348)
 Wallet(23)
