@@ -37,7 +37,7 @@ class Node(implements(GenericNode)):
     #Firstblock
     first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
     
-     __key = open("ssh_keys/private", "r").read()     
+    __key = open("ssh_keys/private", "r").read()     
     #Difficulty:
     #in seconds
     BLOCK_GENERATION_INTERVAL = 10;
