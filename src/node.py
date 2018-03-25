@@ -120,13 +120,17 @@ class Node(implements(GenericNode)):
             return False
         if not self.isTimestampValid(newBlock, previousBlock):
             print("invalid timestamp")
-
+        if not self.hasValidHash(newBlock):
+            return False
+        return True
 
 
 
         pass #TO_DO
 
     def addBlockToChain(self, block):
+        if self.isNewBlockValid(block, self.getLatestBlock()):
+            pass
         pass #TO_DO
 
     def generateRawNextBlock(self,transactions):
