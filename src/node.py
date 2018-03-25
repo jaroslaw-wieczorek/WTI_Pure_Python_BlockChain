@@ -118,6 +118,24 @@ class Node(implements(GenericNode)):
         txOutContent = ""
         for x in transactions.transOUT:
             txOutContent += self.concOUT(x)
+        h=hashlib.sha256((txInContent+txOutContent).encode("utf-8"))
+       # print(h.digest()) 
+        print(h.hexdigest())      
+        return h.hexdigest()
+    
+    
+    def signTransIN(self, transaction: Transaction, transInIndex: int, prvivateKey: str, uspentTransOut: list):
         
-        print(hashlib.sha256((txInContent+txOutContent).encode("utf-8")).digest())      
-        return 
+        pass
+    """
+    const signTxIn = (transaction: Transaction, txInIndex: number,
+                  privateKey: string, aUnspentTxOuts: UnspentTxOut[]): string => {
+    const txIn: TxIn = transaction.txIns[txInIndex];
+    const dataToSign = transaction.id;
+    const referencedUnspentTxOut: UnspentTxOut = findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts);
+    const referencedAddress = referencedUnspentTxOut.address;
+    const key = ec.keyFromPrivate(privateKey, 'hex');
+    const signature: string = toHexString(key.sign(dataToSign).toDER());
+    return signature;
+    };"""
+    
