@@ -49,9 +49,7 @@ class Node(implements(GenericNode)):
         return self.blockchain[-1]
 
     def calculateHash(self, BlockHeader, BlockPayload): #TO_DO FIX THIS
-        h = hashlib.new('sha256')
-
-        h.update(bin(str(BlockHeader)+''+str(BlockPayload)).encode("utf-8"))
+        h=hashlib.sha256((str(BlockHeader)+''+str(BlockPayload)).encode("utf-8"))
         return h.hexdigest()
 
     def generateNextBlockHeader(self):          #Creates the NextBlockHeader and fills it with the appropriate values

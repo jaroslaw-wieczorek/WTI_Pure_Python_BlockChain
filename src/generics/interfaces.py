@@ -45,5 +45,5 @@ class GenericUnspentOutTrans(Interface):
 
 
 class GenericTransaction(Interface):
-    def __init__(self, transOutId, transOutIndex, address, amount):
+    def __init__(self, transID, transIN, transOUT):
         pass
