@@ -34,12 +34,12 @@ p = BlockPayload(t)
 
 h = BlockHeader(0, "dfsfisd", 1318320, 1, 0)
 
-b = Block(h,p)
+
 
 n = Node()
-n.getTransactionId(t)
+print(n.calculateHash(h,p))
 
-n.findNextBlock(b)
+#n.findNextBlock(b)
 
 w = Wallet(48348)
 Wallet(23)

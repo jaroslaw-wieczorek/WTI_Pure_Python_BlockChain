@@ -173,4 +173,4 @@ class Node(implements(GenericNode)):
     
     def signTransIN(self, transaction: Transaction, transInIndex: int, prvivateKey: str, uspentTransOut: list):
         
-        pass
+        return str
