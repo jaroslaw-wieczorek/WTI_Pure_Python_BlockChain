@@ -30,9 +30,7 @@ class GenericBlockPayload(Interface):
 class GenericBlock(Interface):
     
     def __init__(self, blockHeader, blockPayload):
-        self.blockHeader = blockHeader
-        self.blockPayload = blockPayload
-        self.currentHash = None
+        pass
 
        # number, currentHash, previousHash, timestamp, Transaction, difficulty, number
 
@@ -41,6 +39,11 @@ class GenericBlock(Interface):
 
     
 
+class GenericUnspentOutTrans(Interface):
+    def __init__(self, transOutId, transOutIndex, address: str, amount: int):
+        pass
+
+
 class GenericTransaction(Interface):
-    def __init__(self, transID, transIN, transOUT):
+    def __init__(self, transOutId, transOutIndex, address, amount):
         pass

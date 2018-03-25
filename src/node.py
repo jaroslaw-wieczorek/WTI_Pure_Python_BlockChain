@@ -167,6 +167,12 @@ class Node(implements(GenericNode)):
         txOutContent = ""
         for x in transactions.transOUT:
             txOutContent += self.concOUT(x)
+        h=hashlib.sha256((txInContent+txOutContent).encode("utf-8"))
+       # print(h.digest()) 
+        print(h.hexdigest())      
+        return h.hexdigest()
+    
+    
+    def signTransIN(self, transaction: Transaction, transInIndex: int, prvivateKey: str, uspentTransOut: list):
         
-        print(hashlib.sha256((txInContent+txOutContent).encode("utf-8")).digest())      
-        return
+        pass
