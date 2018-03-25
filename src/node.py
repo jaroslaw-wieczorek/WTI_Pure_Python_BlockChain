@@ -14,8 +14,15 @@ from interface import implements
 from src.generics.interfaces import GenericNode
 
 from src.block import Block
+from src.transIN import TransIN
+from src.transOUT import TransOUT
+from src.transaction import Transaction
+
 from src.blockHeader import BlockHeader
 from src.blockPayload import BlockPayload
+
+
+
 
 class Node(implements(GenericNode)):
     #Constant variables:
@@ -43,7 +50,8 @@ class Node(implements(GenericNode)):
 
     def calculateHash(self, BlockHeader, BlockPayload):
         h = hashlib.new('sha256')
-        h.update(str({BlockHeader, BlockPayload}).encode("utf-8"))
+       
+        h.update(bin(str(BlockHeader)+''+str(BlockPayload)).encode("utf-8"))
         return h.hexdigest()
 
     def generateNextBlockHeader(self):
@@ -94,3 +102,22 @@ class Node(implements(GenericNode)):
             return prevAdjustmentBlock.difficulty - 1
         else:
             return prevAdjustmentBlock.difficulty
+
+    
+    def concIN(self, x):
+        return str(x.transOutId) + '' +str(x.transOutIndex)
+    
+    def concOUT(self, x):
+        return str(x.address) + '' +str(x.amount)
+    
+    def getTransactionId(self, transactions: Transaction) -> str:
+        txInContent = ""
+        for x in transactions.transIN:
+            txInContent += self.concIN(x)
+         
+        txOutContent = ""
+        for x in transactions.transOUT:
+            txOutContent += self.concOUT(x)
+        
+        print(hashlib.sha256((txInContent+txOutContent).encode("utf-8")).digest())      
+        return 

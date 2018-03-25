@@ -24,8 +24,8 @@ from src.block import Block
 
 # Tests
 
-txIN = TransIN(1,2,"signaure")
-txOUT = TransOUT("ADRES_WALLETA",50)
+txIN = [TransIN(1,2,"signaure"), TransIN(1,1,"signaure")]
+txOUT = [TransOUT("ADRES_WALLETA",50)]
 
 t = Transaction(1, txIN, txOUT)
 print(t)
@@ -37,7 +37,7 @@ h = BlockHeader(0, "dfsfisd", 1318320, 1, 0)
 b = Block(h,p)
 
 n = Node()
-print(n.calculateHash(h,p))
+n.getTransactionId(t)
 
 w = Wallet(48348)
 Wallet(23)
