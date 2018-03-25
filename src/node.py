@@ -95,6 +95,19 @@ class Node(implements(GenericNode)):
         return previousBlock.blockHeader.timestamp - 60 < newBlock.blockHeader.timestamp &\
                 newBlock.blockHeader.timestamp - 60 < self.getCurrentTimestamp()
 
+    def hashMatchesBlockContent(self, block):
+        return self.calculateHash(block.blockHeader, block.blockPayload) == block.currentHash
+
+    def hasValidHash(self, block):
+        if not self.hashMatchesBlockContent(block):
+            print("invalid hash got:"+ block.currentHash)
+            return False
+        if not self.hashDifficultyCheck(block.currentHash, block.blockHeader.difficulty):
+            print("hash difficulty is not valid, should be:"+ block.blockHeader.difficulty + "got" + bin(int(block.currentHash, 16))[2:].zfill(len(block.currentHash) * 4))
+            return False
+        return True
+
+
     def isNewBlockValid(self, newBlock, previousBlock):
         if not self.isValidBlockStructure(newBlock):
             print("invalid block structure")
@@ -105,7 +118,9 @@ class Node(implements(GenericNode)):
         if previousBlock.currentHash != newBlock.blockHeader.previousHash:
             print("invalid previous hash")
             return False
-        #TO_DO
+        if not self.isTimestampValid(newBlock, previousBlock):
+            print("invalid timestamp")
+
 
 
 
