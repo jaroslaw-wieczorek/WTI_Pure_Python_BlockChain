@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 Created on Sat Mar 24 18:27:18 2018
 
@@ -37,7 +38,10 @@ class Node(implements(GenericNode)):
     #Firstblock
     first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
     
+    # private key
     __key = open("rsa_keys/private", "r").read()
+    
+    __pub_key = open("rsa_keys/key.pub", "r").read()
     
     #Difficulty:
     #in seconds
@@ -187,28 +191,30 @@ class Node(implements(GenericNode)):
     """
     
     def signTransIN(self, transaction: Transaction, transInIndex: int, unspentsTransOuts: list):
-        print(transaction)
-        print
-        print(transInIndex)
-        print
-        print(unspentsTransOuts)
-                
-        print
-                
-        print("###################")
-        transIn = transaction.transIN[transInIndex]
         
-        print(transIn)
-        print
         dataToSign = str(transaction.transID)
         print(dataToSign)
+
         # refUnspentOutTrans = findUnspentOutTrans(transIn.transOutId, trans.transOutIndex, unspentsTransOuts)
         # refAddress = refUnspentOutTrans.address;
-        rsakey = RSA.importKey(self.__key) 
-        signer = PKCS1_v1_5.new(rsakey) 
-        digest = SHA256.new()
+        priv_key = RSA.importKey(self.__key) 
+        signer = PKCS1_v1_5.new(priv_key) 
+        newHash = SHA256.new()
         # It's being assumed the data is base64 encoded, so it's decoded before updating the digest 
-        digest.update(dataToSign.encode("utf-8"))
-        sign = signer.sign(digest)
-        print(sign)
-        return sign
+        newHash.update(dataToSign.encode("utf-8"))
+        return signer.sign(newHash)
+   
+    
+    def verify(self, transaction: Transaction, signature):
+  
+        dataToVerify = (transaction.transID)
+        print(dataToVerify)
+        
+        #public key for tests
+        publ_key = RSA.importKey(self.__pub_key) 
+        signer = PKCS1_v1_5.new(publ_key)
+        newHash = SHA256.new()
+    
+        newHash.update(dataToVerify.encode("utf-8"))
+        return signer.verify(newHash, signature)
+   

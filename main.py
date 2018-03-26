@@ -41,7 +41,10 @@ uT = [UnspentOutTrans(txIN[0].transOutId, txIN[0].transOutIndex, "AddressIN_Unsp
 n = Node()
 print(n.calculateHash(h,p))
 
+
 #n.findNextBlock(b)
-n.signTransIN(t, 0, uT)
+print(n.signTransIN(t, 0, uT))
+print(n.verify(t,n.signTransIN(t, 0, uT)))
+
 w = Wallet(48348)
 Wallet(23)
