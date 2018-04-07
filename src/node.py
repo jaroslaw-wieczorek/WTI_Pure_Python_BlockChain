@@ -47,9 +47,11 @@ class Node(implements(GenericNode),TransMethods):
     
     #Difficulty:
     #in seconds
-    BLOCK_GENERATION_INTERVAL = 10;
+    BLOCK_GENERATION_INTERVAL = 10
     #in blocks
-    DIFFICULTY_ADJUSTMENT_INTERVAL = 10;
+    DIFFICULTY_ADJUSTMENT_INTERVAL = 10
+    #How much do you get for finding a block
+    COINBASE_AMOUNT = 50
 
     def __init__(self):
         self.blockchain = [self.first_block]
@@ -93,15 +95,15 @@ class Node(implements(GenericNode),TransMethods):
         return hashinbinary.startswith('0'*difficulty)
 
     def isValidBlockStructure(self, block):         #Checks the Block fields if they contain the right types
-        return type(block.blockHeader) is BlockHeader &\
-               type(block.blockPayload) is BlockPayload &\
-               type(block.blockHeader.index) is int &\
-               type(block.blockHeader.previousHash) is str &\
-               type(block.blockHeader.timestamp) is float &\
-               type(block.blockHeader.difficulty) is int &\
-               type(block.blockHeader.nonce) is int &\
-               type(block.currentHash) is str &\
-               type(block.blockPayload.data) is object
+        return isinstance(block.blockHeader,BlockHeader) & \
+               isinstance(block.blockPayload, BlockPayload) & \
+               isinstance(block.blockHeader.index, int) & \
+               isinstance(block.blockHeader.previousHash, str) & \
+               isinstance(block.blockHeader.timestamp, float) & \
+               isinstance(block.blockHeader.difficulty, int) & \
+               isinstance(block.blockHeader.nonce, int) & \
+               isinstance(block.currentHash, str) & \
+               isinstance(block.blockPayload.data, object)
 
     def isTimestampValid(self, newBlock, previousBlock):    #Checks if the Timestamp is within the specified time
         return previousBlock.blockHeader.timestamp - 60 < newBlock.blockHeader.timestamp &\
