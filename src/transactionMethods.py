@@ -99,3 +99,28 @@ class TransMethods():
     
         newHash.update(dataToVerify.encode("utf-8"))
         return signer.verify(newHash, signature)
+
+    def validateCoinbaseTx(self, transaction, blockIndex):
+        if transaction == None:
+            print('the first transaction in the block must be coinbase transaction')
+            return False
+
+        if self.getTransactionId(transaction) != transaction.transID :
+            print('invalid coinbase tx id: ' + transaction.transID)
+            return False
+        if transaction.transIN.length != 1:
+            print('one txIn must be specified in the coinbase transaction')
+            return False
+
+        if transaction.transIN[0].transOutIndex != blockIndex:
+            print('the txIn signature in coinbase tx must be the block height')
+            return False
+
+        if transaction.txOuts.length != 1:
+            print('invalid number of txOuts in coinbase transaction')
+            return False
+
+        if transaction.txOuts[0].amount != self.COINBASE_AMOUNT:
+            print('invalid coinbase amount in coinbase transaction')
+            return False
+        return True
