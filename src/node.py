@@ -182,7 +182,15 @@ class Node(implements(GenericNode)):
         print(h.hexdigest())      
         return h.hexdigest() #return string 
     
-    def newUnspentOutTrans():
+    def newUnspentOutTrans(self,):
+        
+        """
+        const newUnspentTxOuts: UnspentTxOut[] = newTransactions
+        .map((t) => {
+            return t.txOuts.map((txOut, index) => new UnspentTxOut(t.id, index, txOut.address, txOut.amount));
+        })
+        .reduce((a, b) => a.concat(b), []);
+        """
         pass
     
     """

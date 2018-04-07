@@ -11,7 +11,7 @@ class UnspentOutTrans(implements(GenericUnspentOutTrans)):
         self.address = address
         self.transOutId = transOutId
         self.transOutIndex = transOutIndex
-     
+
 
     def __repr__(self):
         return str(self.__dict__)
