@@ -3,6 +3,7 @@
 import hashlib
 import datetime
 from datetime import timezone
+from functools import reduce
 
 
 from src.transIN import TransIN
@@ -60,8 +61,8 @@ class TransMethods():
         if referencedUnTransOut == None:
             print('[*] referenced transOut not found: ' + str(transIn))
         return False
-    
-    
+       
+        
         # TO check ! 
         address = referencedUnTransOut.address;
         
@@ -74,11 +75,24 @@ class TransMethods():
         
         validSignature : bool = signer.verify(newHash, transIn.signature)
         
-        if not validSignature :
-            print ("Invalid transIn signature: %s transId: %s address: %s" % transIn.signature, transaction.id, referencedUnTransOut.address)
+        if not validSignature:
+            print("Invalid transIn signature: %s transId: %s address: %s" % transIn.signature, transaction.id, referencedUnTransOut.address)
             return False
         
         return True
+    
+    # Conitune in this element
+    
+    def findUnspentTransOut(self, transId: str, index: int, aUnspentTransOut: UnspentOutTrans):
+        for uTransOut in aUnspentTransOut:
+            if uTransOut.transOutId == transId and uTransOut.transOutIndex == index:
+                return uTransOut
+        
+    
+    
+    def getTransInAmount(self, transIn : TransIN, aUnspentTransOuts : UnspentOutTrans) -> float:
+        return UnspentOutTrans(transIn.transOutId, transIn.transOutIndex, aUnspentTransOuts).amount;
+    
     
     
     def validateTransaction(self, transaction:Transaction, aUnspentOutTrans:UnspentOutTrans):
@@ -87,13 +101,27 @@ class TransMethods():
             return False
         
         if self.getTransactionId(transaction) != transaction.transID:
-            print("Invalid tx id: " + transaction.transID)
+            print("[*] Invalid tx id: " + transaction.transID)
             return False
         
-        hasValidTransINs : bool = validateTransIN
-     
-     
+        hasValidTransINs : bool = reduce((lambda transIn: 
+                                            self.validateTransIN(transIn,
+                                            transaction, aUnspentOutTrans), 
+                                            transaction.transIN
+                                        ))
+        print(hasValidTransINs)
+        
+        if not hasValidTransINs:
+             print('[*] some of the transINs are invalid in trans: ' + transaction.transID);
+             return False
+         
+        totalTransInValues : float = reduce((lambda x,y: self.getTransInAmount(x, aUnspentOutTrans) + self.getTransInAmount(y, aUnspentOutTrans), transaction.transIn))
+        
+
+
     def newUnspentOutTrans(self):
+        pass
+        
         
         """
         const newUnspentTxOuts: UnspentTxOut[] = newTransactions
@@ -102,21 +130,18 @@ class TransMethods():
         })
         .reduce((a, b) => a.concat(b), []);
         """
-        pass
+     
+
     
-    """
-    def findUnspentOutTrans(ransIn.transOutId, trans.transOutIndex, unspentsTransOuts):
-        pass
-    """
     
-    def signTransIN(self, transaction: Transaction, transInIndex: int, unspentsTransOuts: list):
+    def signTransIN(self, transaction: Transaction, transInIndex: int, aUnspentOutTrans: UnspentOutTrans):
         
         transIn = transaction.transIN[transInIndex]
         dataToSign = str(transaction.transID)
         print(dataToSign)
 
-        # refUnspentOutTrans = findUnspentOutTrans(transIn.transOutId, trans.transOutIndex, unspentsTransOuts)
-        # refAddress = refUnspentOutTrans.address;
+        refUnspentOutTrans : UnspentOutTrans = self.findUnspentTransOut(transIn.transOutId, transIn.transOutIndex, aUnspentOutTrans)
+        refAddress = refUnspentOutTrans.address;
         priv_key = RSA.importKey(self.__key) 
         signer = PKCS1_v1_5.new(priv_key) 
         newHash = SHA256.new()
@@ -136,6 +161,7 @@ class TransMethods():
         
         newHash.update(dataToVerify.encode("utf-8"))
         return signer.verify(newHash, signature)
+    
 
     def validateCoinbaseTx(self, transaction, blockIndex):
         if transaction == None:
