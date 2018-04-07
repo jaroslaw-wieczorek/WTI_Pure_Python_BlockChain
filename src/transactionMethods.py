@@ -18,18 +18,22 @@ from base64 import b64encode, b64decode
 class TransMethods():
     
     __key = open("rsa_keys/private", "r").read()
-
     __pub_key = open("rsa_keys/key.pub", "r").read()
+    
+    
     def __init__(self):
         self.__key = open("rsa_keys/private", "r").read()
 
         self.__pub_key = open("rsa_keys/key.pub", "r").read()
     
+    
     def concIN(self, x):
         return str(x.transOutId) + '' +str(x.transOutIndex)
     
+    
     def concOUT(self, x):
         return str(x.address) + '' +str(x.amount)
+    
     
     def getTransactionId(self, transactions: Transaction) -> str:
         txInContent = ""
@@ -44,18 +48,51 @@ class TransMethods():
         print(h.hexdigest())      
         return h.hexdigest() #return string 
     
+    
     # To do: implement
-    def isValidTransactionStructure(transaction:Transaction):
+    def isValidTransactionStructure(self, transaction:Transaction):
         return True
+    
    
+    def validateTransIn(self, transIn:TransIN, transaction:Transaction, aUnspentOutTrans : UnspentOutTrans) -> bool:
+        referencedUnTransOut: UnspentOutTrans = aUnspentOutTrans.find([lambda uTransOut: uTransOut in uTransOut.transOutId == transIn.transOutId and uTransOut.transOutIndex == transIn.transOutIndex])
+ 
+        if referencedUnTransOut == None:
+            print('[*] referenced transOut not found: ' + str(transIn))
+        return False
+    
+    
+        # TO check ! 
+        address = referencedUnTransOut.address;
+        
+        publ_key = RSA.importKey(address) 
+        
+        signer = PKCS1_v1_5.new(publ_key)
+        newHash = SHA256.new()
+        dataToVerify = (transaction.transID)
+        newHash.update(dataToVerify.encode("utf-8"))
+        
+        validSignature : bool = signer.verify(newHash, transIn.signature)
+        
+        if not validSignature :
+            print ("Invalid transIn signature: %s transId: %s address: %s" % transIn.signature, transaction.id, referencedUnTransOut.address)
+            return False
+        
+        return True
+    
+    
     def validateTransaction(self, transaction:Transaction, aUnspentOutTrans:UnspentOutTrans):
+       
         if not self.isValidTransactionStructure(transaction):
             return False
+        
         if self.getTransactionId(transaction) != transaction.transID:
             print("Invalid tx id: " + transaction.transID)
             return False
-     #   hasValidTransINs : bool = 
-    
+        
+        hasValidTransINs : bool = validateTransIN
+     
+     
     def newUnspentOutTrans(self):
         
         """
@@ -96,6 +133,6 @@ class TransMethods():
         publ_key = RSA.importKey(self.__pub_key) 
         signer = PKCS1_v1_5.new(publ_key)
         newHash = SHA256.new()
-    
+        
         newHash.update(dataToVerify.encode("utf-8"))
         return signer.verify(newHash, signature)
