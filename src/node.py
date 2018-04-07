@@ -20,6 +20,8 @@ from src.block import Block
 from src.transIN import TransIN
 from src.transOUT import TransOUT
 from src.transaction import Transaction
+from src.unspentOutTrans import UnspentOutTrans
+from src.transactionMethods import TransMethods
 
 from src.blockHeader import BlockHeader
 from src.blockPayload import BlockPayload
@@ -31,7 +33,7 @@ from base64 import b64encode, b64decode
 
 
 
-class Node(implements(GenericNode)):
+class Node(implements(GenericNode),TransMethods):
     #Constant variables:
     #Firsttransaction
     first_transaction = None #TO_DO add the first transaction!
@@ -163,66 +165,5 @@ class Node(implements(GenericNode)):
             return prevAdjustmentBlock.difficulty
 
     
-    def concIN(self, x):
-        return str(x.transOutId) + '' +str(x.transOutIndex)
-    
-    def concOUT(self, x):
-        return str(x.address) + '' +str(x.amount)
-    
-    def getTransactionId(self, transactions: Transaction) -> str:
-        txInContent = ""
-        for x in transactions.transIN:
-            txInContent += self.concIN(x)
-         
-        txOutContent = ""
-        for x in transactions.transOUT:
-            txOutContent += self.concOUT(x)
-        h=hashlib.sha256((txInContent+txOutContent).encode("utf-8"))
-       # print(h.digest()) 
-        print(h.hexdigest())      
-        return h.hexdigest() #return string 
-    
-    def newUnspentOutTrans(self,):
-        
-        """
-        const newUnspentTxOuts: UnspentTxOut[] = newTransactions
-        .map((t) => {
-            return t.txOuts.map((txOut, index) => new UnspentTxOut(t.id, index, txOut.address, txOut.amount));
-        })
-        .reduce((a, b) => a.concat(b), []);
-        """
-        pass
-    
-    """
-    def findUnspentOutTrans(ransIn.transOutId, trans.transOutIndex, unspentsTransOuts):
-        pass
-    """
-    
-    def signTransIN(self, transaction: Transaction, transInIndex: int, unspentsTransOuts: list):
-        
-        dataToSign = str(transaction.transID)
-        print(dataToSign)
 
-        # refUnspentOutTrans = findUnspentOutTrans(transIn.transOutId, trans.transOutIndex, unspentsTransOuts)
-        # refAddress = refUnspentOutTrans.address;
-        priv_key = RSA.importKey(self.__key) 
-        signer = PKCS1_v1_5.new(priv_key) 
-        newHash = SHA256.new()
-        # It's being assumed the data is base64 encoded, so it's decoded before updating the digest 
-        newHash.update(dataToSign.encode("utf-8"))
-        return signer.sign(newHash)
-   
-    
-    def verify(self, transaction: Transaction, signature):
-  
-        dataToVerify = (transaction.transID)
-        print(dataToVerify)
-        
-        #public key for tests
-        publ_key = RSA.importKey(self.__pub_key) 
-        signer = PKCS1_v1_5.new(publ_key)
-        newHash = SHA256.new()
-    
-        newHash.update(dataToVerify.encode("utf-8"))
-        return signer.verify(newHash, signature)
    
