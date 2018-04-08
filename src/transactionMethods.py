@@ -205,4 +205,8 @@ class TransMethods():
         normalTransactions = aTransactions[1:]
         return reduce((lambda a, b: a & b), list(map(lambda tx: self.validateTransaction(tx, aUnspentTxOuts), normalTransactions)), True)
 
-
+    def processTransactions(self, aTransactions, aUnspentTxOuts, blockIndex):
+        if not self.validateBlockTransactions(aTransactions, aUnspentTxOuts, blockIndex):
+            print('invalid block transactions')
+            return None
+        return self.updateUnspentTxOuts(aTransactions, aUnspentTxOuts) #TO_DO NOT IMPLEMENTED yet

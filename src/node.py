@@ -138,11 +138,26 @@ class Node(implements(GenericNode),TransMethods):
             return False
         return True
 
+    #Missing functions, do not use
+    def addBlockToChain(self, newBlock):
+        if self.isNewBlockValid(newBlock, self.getLatestBlock()):
+            retVal = TransMethods.processTransactions(newBlock.data, getUnspentTxOuts(), newBlock.index) #getUnspentTxOuts ALSO NOT IMPLEMENTED TO_DO
+            if (retVal == None):
+                print('block is not valid in terms of transactions');
+                return False
+            else:
+                self.blockchain.append(newBlock)
+                setUnspentTxOuts(retVal) #TO_DO setUnspentTxOuts ALSO NOT IMPLEMENTED
+                updateTransactionPool(unspentTxOuts) #TO_DO NOTHING IS IMPLEMENTED
+                return True
 
-    def addBlockToChain(self, block):
-        if self.isNewBlockValid(block, self.getLatestBlock()):
-            pass
-        pass #TO_DO missing UnspentTransOut
+        return False
+
+
+
+
+
+
 
     def generateRawNextBlock(self,transactions):
         newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))
@@ -165,7 +180,3 @@ class Node(implements(GenericNode),TransMethods):
             return prevAdjustmentBlock.difficulty - 1
         else:
             return prevAdjustmentBlock.difficulty
-
-    
-
-   
