@@ -187,3 +187,22 @@ class TransMethods():
             print('invalid coinbase amount in coinbase transaction')
             return False
         return True
+
+    def validateBlockTransactions(self,aTransactions, aUnspentTxOuts, blockIndex):
+        coinbaseTx = aTransactions[0]
+        if not self.validateCoinbaseTx(self,coinbaseTx, blockIndex):
+            print('invalid coinbase transaction: ' + coinbaseTx)
+            return False
+
+        # check for duplicate txIns. Each txIn can be included only once
+        txIns = list(map(lambda x: x.transIN, aTransactions))
+
+        if len(txIns) != len(set(txIns)):
+            return False
+
+
+        # all but coinbase transactions
+        normalTransactions = aTransactions[1:]
+        return reduce((lambda a, b: a & b), list(map(lambda tx: self.validateTransaction(tx, aUnspentTxOuts), normalTransactions)), True)
+
+
