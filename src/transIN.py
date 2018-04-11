@@ -3,7 +3,6 @@
 """
 Created on Sat Mar 24 18:27:56 2018
 
-@author: afar
 """
 
 class TransIN():

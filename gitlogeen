@@ -1,0 +1,332 @@
+commit c7a6a20ef14668d6db357e176db64cfa31eb7250
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sun Apr 8 14:55:18 2018 +0200
+
+    Expanded the addBlockToChain function in node, added processTransactions to transactionMethods.
+
+commit ca680c1d0189e0e343e6e7a81ead391f1cb6a889
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sun Apr 8 14:37:57 2018 +0200
+
+    Added validateBlockTransactions.
+
+commit 4aef526d2c2768fb6801f3577bbee3cbce46e21f
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Apr 7 17:37:48 2018 +0200
+
+    add find method for unspent transOut
+
+commit ffe14b34f6fd7d1b2c32460926cf4a0c03cb9cf6
+Merge: ad5d5fc 011e695
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Apr 7 15:24:57 2018 +0200
+
+    Merge branch 'master' of github.com:jaroslaw-wieczorek/WTI_Pure_Python_BlockChain
+
+commit ad5d5fc447db5b4e13fa1a3d54e8e1f7451c85a8
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Apr 7 15:24:24 2018 +0200
+
+    Add validateTransIn method
+
+commit 011e695e87a940e67b32536d681f8f35cf795bdc
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Apr 7 14:48:45 2018 +0200
+
+    Added CoinbaseTx Validation and Coinbase Amount.
+
+commit 2f1c980e8cc34aea9dc0c85983e54260bac4dca1
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Apr 7 13:33:21 2018 +0200
+
+    add several methods for transactions and move transaction logic from node to transactionMethods
+
+commit 504119645a25c787ba02a53a9dc8bee2117f7727
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Apr 7 12:02:39 2018 +0200
+
+    modify UML
+
+commit 5138da2d30f915a81c6b7a22c57651c2195f3746
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Mon Mar 26 13:07:52 2018 +0200
+
+    Add a new sample pair of RSA keys and the 'Verify' method to verify the signed data.
+
+commit a648292c2f014285df53e51c283f9f88403980dd
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 23:25:37 2018 +0200
+
+    add signtransIN to check, small fix
+
+commit bcbb2d291a6cdd22ea735ae9fedd023bd952ee72
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 20:20:14 2018 +0200
+
+    small fix and add private variable contains value of rsa key
+
+commit 304bc7ce7abb8cad3bf947f7ecd383c7b70010c2
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 20:13:08 2018 +0200
+
+    small fix and add private variable contains value of ssh key
+
+commit 5611d35f11ca2d57166f61af3dbcd4bdde928605
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 20:12:36 2018 +0200
+
+    small fix and add private variable contains value of ssh key
+
+commit 4b93e691a0859f034bc07479f6cda18a3de24366
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 19:28:36 2018 +0200
+
+    check calculationHash
+
+commit ae4e4e9db99436489d5eb8f193b086c843f3ad2e
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 19:18:26 2018 +0200
+
+    fix calculateHash
+
+commit 303ed613410b6d03f56247b118532a4f6bc22bc9
+Merge: 06c411e 7d271ee
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 18:52:22 2018 +0200
+
+    Merge remote-tracking branch 'origin/master'
+
+commit 06c411e7e9e9e10c90375a3c023deb767fd0b71e
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 18:51:34 2018 +0200
+
+    Auto stash before rebase of "origin/master"
+
+commit 7d271ee2045086e7b460a8937082f9d36954f20d
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 18:51:34 2018 +0200
+
+    Auto stash before rebase of "origin/master"
+
+commit 8fd0e0ca0da65a4fcfa43317f94ad161dc018c02
+Merge: 3b2404d c16d8f2
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 18:50:37 2018 +0200
+
+    Merge branch 'master' into origin/master
+
+commit c16d8f282189ead9c0c8b6e3d8a7891b14943541
+Merge: aaafdd4 3b2404d
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 18:46:30 2018 +0200
+
+    Merge remote-tracking branch 'origin/master'
+
+commit aaafdd49597ccfd709ef5f7ccfdbdbd1bf3a68bb
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 18:42:05 2018 +0200
+
+    Add GenericUnspentOutTrans class
+
+commit 3b2404d21ab064634d7a3d9bae13ef3d8dc0040b
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sun Mar 25 17:53:18 2018 +0200
+
+    Added lots of comments. For comment purposes.
+
+commit 80efb2ab908f8009aa6f47eac7ad013d01d1d9df
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sun Mar 25 17:36:58 2018 +0200
+
+    Small adjustments to block checking.
+
+commit 9f603616abe6745dc66acdafc1451764061baaff
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sun Mar 25 17:31:01 2018 +0200
+
+    More hash checking.
+
+commit 6e0dc7380f800f8bee3a9ddc364f3fc4bedcecc6
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sun Mar 25 17:18:48 2018 +0200
+
+    Timestamp validation and block validation in progress.
+
+commit 6aade5bc7778295955eced9a4b4ddfe08ff32fce
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sun Mar 25 17:04:13 2018 +0200
+
+    Added more missing classes, implemented a few checks.
+
+commit 1f7c73bff60a0fae2089b839250c2740ff4f9608
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sun Mar 25 10:16:28 2018 +0200
+
+    Add getTransactionID
+
+commit c3dc1b65f06b890502c8b0b18150f01c1bfcde2e
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 20:21:56 2018 +0100
+
+    Added a first draft of block generation, difficulty checking and blockfinding.
+
+commit 906f880feaa57ff246f9383e9a19afb7dd09dfc3
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 19:15:01 2018 +0100
+
+    Cleaned up difficulty functions in node.
+
+commit 1dc69f155fa54cd08bf27b80dbe701c822cca0e6
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Mar 24 19:05:35 2018 +0100
+
+    Reworked the code to be contained in multiple directories and imports.
+
+commit 8b4981bed90e3c4cca4a8bb30a9b51e590044f22
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 18:06:42 2018 +0100
+
+    Added getDifficulty and getAdjustedDifficulty for Difficluty calculation.
+
+commit 2151846d24625fa74ea6560a02b1b18b84b64ef2
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 17:38:46 2018 +0100
+
+    Added getCurrentTimeStamp
+
+commit 7625f1375c4ef213325506f0fc719ea7ae819152
+Merge: d4a2765 629f958
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 17:34:37 2018 +0100
+
+    Merge remote-tracking branch 'origin/master'
+
+commit 629f958556d80bbd867dde8a30cbc1743a549b59
+Author: Chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 17:33:48 2018 +0100
+
+    Changed Node class.
+    
+    Added generateNextBlockHeader and getLatestBlock.
+    Added more constants.
+
+commit d4a27654cafc4a9519311d7523964ca31f4033b8
+Merge: d86ff54 e9d29fb
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 17:30:51 2018 +0100
+
+    Merge remote-tracking branch 'origin/master'
+    
+    # Conflicts:
+    #       interfaces.py
+
+commit d86ff544836832c193ad214f17fa958c5864fc78
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 17:20:39 2018 +0100
+
+    Added generateNextBlockHeader and getLatestBlock.
+    Added more constants.
+
+commit e9d29fbb6e7655bf06e68237a7ff05ed97b33ced
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Mar 24 16:56:30 2018 +0100
+
+    add calculateHash method in Node
+
+commit 51d29e532b1dba039ec0b1ee579345a831eacead
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 24 15:50:05 2018 +0100
+
+    Added first Node class.
+
+commit 1bdf4bd601a81ea9b695e3729a0e315dca28e829
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Mar 24 15:19:48 2018 +0100
+
+    Add GenericTransaction add implement interfaces
+
+commit 8c7e5c14ce810cdc6effcabe06c0ad0e651acd62
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Mar 24 14:58:11 2018 +0100
+
+    Add GenericBlockHeader interface
+
+commit 0c9c81341d8b6a4ae070fa04e811c71f41261d92
+Merge: 425c6e0 fb43c9f
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Mar 24 14:57:11 2018 +0100
+
+    rename
+
+commit 425c6e0165d719e758b78cd3e0b5f6d9a2b21ffd
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Mar 24 14:55:16 2018 +0100
+
+    add interfaces GenericBlockHeader
+
+commit fb43c9fb46ff3c7e088f2a66017305f7a6d33dcf
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Thu Mar 22 15:20:08 2018 +0100
+
+    Added additional classes.
+
+commit d92d9a9b97335c1e79b9dc26c577db908b66997e
+Author: chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Thu Mar 22 15:06:31 2018 +0100
+
+    Fixed spelling
+
+commit 140ed422cca97b5b7a279cac3bb4d2688d92a023
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Thu Mar 22 14:03:13 2018 +0100
+
+    add interfaceses
+
+commit 913322fa3012772fedb118ff453232d25cb3db1e
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Thu Mar 22 11:50:01 2018 +0100
+
+    mv BlockChain Ontology
+
+commit 735ea2bdf501b699c95763999e40e9e6b71d8790
+Merge: 45f0f8c 8492471
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Thu Mar 22 11:48:29 2018 +0100
+
+    Merge remote-tracking branch 'origin/master'
+
+commit 45f0f8cf39318c70585f778dafc4511b371c0098
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Thu Mar 22 11:46:10 2018 +0100
+
+    remove owl files
+
+commit e897820852a0cf84e5e1c0ae50147ea98214c710
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Thu Mar 22 11:41:21 2018 +0100
+
+    move BlockChain.owl
+
+commit 342d879aaa66c1ba34d202103e95d53ad0fff7bb
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Thu Mar 22 11:40:08 2018 +0100
+
+    Add ontology
+
+commit 849247130c96c7b8acbbd6b9686c1d53f5321218
+Author: Chris642 <krzysztof.orczyk@student.put.poznan.pl>
+Date:   Sat Mar 17 20:34:55 2018 +0100
+
+    Added description comments.
+
+commit 6257012f8c285c694ea222d96c33deb5126f8fde
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Mar 17 19:40:28 2018 +0100
+
+    Add ontology hierarchy of classes
+
+commit 4576f4ab56df22d45bb17be65d0f5efcd945aad6
+Author: Jarosław Wieczorek <jaroslaw.wieczorek@sealcode.org>
+Date:   Sat Mar 17 19:28:49 2018 +0100
+
+    Initial commit

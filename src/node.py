@@ -4,7 +4,6 @@
 """
 Created on Sat Mar 24 18:27:18 2018
 
-@author: afar
 """
 
 import datetime
@@ -34,6 +33,8 @@ from base64 import b64encode, b64decode
 
 
 class Node(implements(GenericNode),TransMethods):
+    '''
+    '''
     #Constant variables:
     #Firsttransaction
     first_transaction = None #TO_DO add the first transaction!
@@ -152,12 +153,6 @@ class Node(implements(GenericNode),TransMethods):
                 return True
 
         return False
-
-
-
-
-
-
 
     def generateRawNextBlock(self,transactions):
         newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))

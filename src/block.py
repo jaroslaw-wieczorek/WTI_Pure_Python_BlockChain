@@ -3,7 +3,6 @@
 """
 Created on Sat Mar 24 18:28:34 2018
 
-@author: afar
 """
 
 from interface import implements

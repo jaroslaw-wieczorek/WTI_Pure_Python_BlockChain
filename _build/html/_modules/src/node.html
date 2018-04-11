@@ -1,0 +1,254 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>src.node &#8212; WTI-UntitledCoin  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for src.node</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Sat Mar 24 18:27:18 2018</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">timezone</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+
+<span class="kn">from</span> <span class="nn">interface</span> <span class="k">import</span> <span class="n">implements</span> 
+<span class="kn">from</span> <span class="nn">src.generics.interfaces</span> <span class="k">import</span> <span class="n">GenericNode</span>
+
+
+<span class="kn">from</span> <span class="nn">src.wallet</span> <span class="k">import</span> <span class="n">Wallet</span>
+<span class="kn">from</span> <span class="nn">src.block</span> <span class="k">import</span> <span class="n">Block</span>
+<span class="kn">from</span> <span class="nn">src.transIN</span> <span class="k">import</span> <span class="n">TransIN</span>
+<span class="kn">from</span> <span class="nn">src.transOUT</span> <span class="k">import</span> <span class="n">TransOUT</span>
+<span class="kn">from</span> <span class="nn">src.transaction</span> <span class="k">import</span> <span class="n">Transaction</span>
+<span class="kn">from</span> <span class="nn">src.unspentOutTrans</span> <span class="k">import</span> <span class="n">UnspentOutTrans</span>
+<span class="kn">from</span> <span class="nn">src.transactionMethods</span> <span class="k">import</span> <span class="n">TransMethods</span>
+
+<span class="kn">from</span> <span class="nn">src.blockHeader</span> <span class="k">import</span> <span class="n">BlockHeader</span>
+<span class="kn">from</span> <span class="nn">src.blockPayload</span> <span class="k">import</span> <span class="n">BlockPayload</span>
+
+<span class="kn">from</span> <span class="nn">Crypto.PublicKey</span> <span class="k">import</span> <span class="n">RSA</span> 
+<span class="kn">from</span> <span class="nn">Crypto.Signature</span> <span class="k">import</span> <span class="n">PKCS1_v1_5</span> 
+<span class="kn">from</span> <span class="nn">Crypto.Hash</span> <span class="k">import</span> <span class="n">SHA256</span> 
+<span class="kn">from</span> <span class="nn">base64</span> <span class="k">import</span> <span class="n">b64encode</span><span class="p">,</span> <span class="n">b64decode</span> 
+
+
+
+<div class="viewcode-block" id="Node"><a class="viewcode-back" href="../../index.html#src.node.Node">[docs]</a><span class="k">class</span> <span class="nc">Node</span><span class="p">(</span><span class="n">implements</span><span class="p">(</span><span class="n">GenericNode</span><span class="p">),</span><span class="n">TransMethods</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1">#Constant variables:</span>
+    <span class="c1">#Firsttransaction</span>
+    <span class="n">first_transaction</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1">#TO_DO add the first transaction!</span>
+    <span class="c1">#Firstblock</span>
+    <span class="n">first_block</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">BlockHeader</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;May your spirit be always backed by enough firepower.&quot;</span><span class="p">,</span> <span class="mi">00000000</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">BlockPayload</span><span class="p">(</span><span class="n">first_transaction</span><span class="p">))</span>
+    
+    <span class="c1"># private key</span>
+    <span class="n">__key</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;rsa_keys/private&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    
+    <span class="n">__pub_key</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;rsa_keys/key.pub&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    
+    <span class="c1">#Difficulty:</span>
+    <span class="c1">#in seconds</span>
+    <span class="n">BLOCK_GENERATION_INTERVAL</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="c1">#in blocks</span>
+    <span class="n">DIFFICULTY_ADJUSTMENT_INTERVAL</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="c1">#How much do you get for finding a block</span>
+    <span class="n">COINBASE_AMOUNT</span> <span class="o">=</span> <span class="mi">50</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blockchain</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">first_block</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Node.getBlockchain"><a class="viewcode-back" href="../../index.html#src.node.Node.getBlockchain">[docs]</a>    <span class="k">def</span> <span class="nf">getBlockchain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blockchain</span></div>
+
+<div class="viewcode-block" id="Node.getCurrentTimestamp"><a class="viewcode-back" href="../../index.html#src.node.Node.getCurrentTimestamp">[docs]</a>    <span class="k">def</span> <span class="nf">getCurrentTimestamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span></div>
+<div class="viewcode-block" id="Node.getLatestBlock"><a class="viewcode-back" href="../../index.html#src.node.Node.getLatestBlock">[docs]</a>    <span class="k">def</span> <span class="nf">getLatestBlock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">blockchain</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Node.calculateHash"><a class="viewcode-back" href="../../index.html#src.node.Node.calculateHash">[docs]</a>    <span class="k">def</span> <span class="nf">calculateHash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">BlockHeader</span><span class="p">,</span> <span class="n">BlockPayload</span><span class="p">):</span> <span class="c1">#TO_DO FIX THIS</span>
+        <span class="n">h</span><span class="o">=</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">BlockHeader</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">BlockPayload</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Node.generateNextBlockHeader"><a class="viewcode-back" href="../../index.html#src.node.Node.generateNextBlockHeader">[docs]</a>    <span class="k">def</span> <span class="nf">generateNextBlockHeader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>          <span class="c1">#Creates the NextBlockHeader and fills it with the appropriate values</span>
+        <span class="n">previousBlock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLatestBlock</span><span class="p">()</span>
+        <span class="n">difficulty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDifficulty</span><span class="p">()</span>
+        <span class="n">nonce</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nextIndex</span> <span class="o">=</span> <span class="n">previousBlock</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">nextTimestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentTimestamp</span><span class="p">()</span>
+        <span class="n">newBlockHeader</span> <span class="o">=</span> <span class="n">BlockHeader</span><span class="p">(</span><span class="n">nextIndex</span><span class="p">,</span> <span class="n">previousBlock</span><span class="o">.</span><span class="n">hash</span><span class="p">,</span> <span class="n">nextTimestamp</span><span class="p">,</span> <span class="n">difficulty</span><span class="p">,</span> <span class="n">nonce</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">newBlockHeader</span></div>
+
+<div class="viewcode-block" id="Node.generateNextBlockPayload"><a class="viewcode-back" href="../../index.html#src.node.Node.generateNextBlockPayload">[docs]</a>    <span class="k">def</span> <span class="nf">generateNextBlockPayload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transactions</span><span class="p">):</span> <span class="c1">#TO_DO TRANSACTIONS AND PAYLOAD NOT YET IMPLEMENTED</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Node.findNextBlock"><a class="viewcode-back" href="../../index.html#src.node.Node.findNextBlock">[docs]</a>    <span class="k">def</span> <span class="nf">findNextBlock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">block</span><span class="p">):</span>    <span class="c1">#Proof of work, finding the hash that matches the given difficulty for a block</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">nonce</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateHash</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">blockPayload</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashDifficultyCheck</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">difficulty</span><span class="p">):</span>
+                <span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">nonce</span>
+                <span class="n">block</span><span class="o">.</span><span class="n">currentHash</span> <span class="o">=</span> <span class="nb">hash</span>
+                <span class="k">return</span> <span class="n">block</span>
+            <span class="n">nonce</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Node.hashDifficultyCheck"><a class="viewcode-back" href="../../index.html#src.node.Node.hashDifficultyCheck">[docs]</a>    <span class="k">def</span> <span class="nf">hashDifficultyCheck</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">hash</span><span class="p">,</span> <span class="n">difficulty</span><span class="p">):</span> <span class="c1">#Checks if the hash when written in binary starts with enough zeroes</span>
+        <span class="n">hashinbinary</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">hash</span><span class="p">,</span> <span class="mi">16</span><span class="p">))[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hashinbinary</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="o">*</span><span class="n">difficulty</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Node.isValidBlockStructure"><a class="viewcode-back" href="../../index.html#src.node.Node.isValidBlockStructure">[docs]</a>    <span class="k">def</span> <span class="nf">isValidBlockStructure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>         <span class="c1">#Checks the Block fields if they contain the right types</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="p">,</span><span class="n">BlockHeader</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockPayload</span><span class="p">,</span> <span class="n">BlockPayload</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">previousHash</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">difficulty</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">nonce</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">currentHash</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="o">&amp;</span> \
+               <span class="nb">isinstance</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockPayload</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Node.isTimestampValid"><a class="viewcode-back" href="../../index.html#src.node.Node.isTimestampValid">[docs]</a>    <span class="k">def</span> <span class="nf">isTimestampValid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newBlock</span><span class="p">,</span> <span class="n">previousBlock</span><span class="p">):</span>    <span class="c1">#Checks if the Timestamp is within the specified time</span>
+        <span class="k">return</span> <span class="n">previousBlock</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">-</span> <span class="mi">60</span> <span class="o">&lt;</span> <span class="n">newBlock</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&amp;</span>\
+                <span class="n">newBlock</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">-</span> <span class="mi">60</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">getCurrentTimestamp</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Node.hashMatchesBlockContent"><a class="viewcode-back" href="../../index.html#src.node.Node.hashMatchesBlockContent">[docs]</a>    <span class="k">def</span> <span class="nf">hashMatchesBlockContent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>       <span class="c1">#Validation of the block hash</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculateHash</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">blockPayload</span><span class="p">)</span> <span class="o">==</span> <span class="n">block</span><span class="o">.</span><span class="n">currentHash</span></div>
+
+<div class="viewcode-block" id="Node.hasValidHash"><a class="viewcode-back" href="../../index.html#src.node.Node.hasValidHash">[docs]</a>    <span class="k">def</span> <span class="nf">hasValidHash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>          <span class="c1">#Checks the if the hash is correctly calculated, including difficulty</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashMatchesBlockContent</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;invalid hash got:&quot;</span><span class="o">+</span> <span class="n">block</span><span class="o">.</span><span class="n">currentHash</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hashDifficultyCheck</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">currentHash</span><span class="p">,</span> <span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">difficulty</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;hash difficulty is not valid, should be:&quot;</span><span class="o">+</span> <span class="n">block</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">difficulty</span> <span class="o">+</span> <span class="s2">&quot;got&quot;</span> <span class="o">+</span> <span class="nb">bin</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">currentHash</span><span class="p">,</span> <span class="mi">16</span><span class="p">))[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">currentHash</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Node.isNewBlockValid"><a class="viewcode-back" href="../../index.html#src.node.Node.isNewBlockValid">[docs]</a>    <span class="k">def</span> <span class="nf">isNewBlockValid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newBlock</span><span class="p">,</span> <span class="n">previousBlock</span><span class="p">):</span> <span class="c1">#Checks the validity of any new block</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isValidBlockStructure</span><span class="p">(</span><span class="n">newBlock</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;invalid block structure&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">previousBlock</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">!=</span> <span class="n">newBlock</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;invalid index&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">previousBlock</span><span class="o">.</span><span class="n">currentHash</span> <span class="o">!=</span> <span class="n">newBlock</span><span class="o">.</span><span class="n">blockHeader</span><span class="o">.</span><span class="n">previousHash</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;invalid previous hash&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">isTimestampValid</span><span class="p">(</span><span class="n">newBlock</span><span class="p">,</span> <span class="n">previousBlock</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;invalid timestamp&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hasValidHash</span><span class="p">(</span><span class="n">newBlock</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="c1">#Missing functions, do not use</span>
+<div class="viewcode-block" id="Node.addBlockToChain"><a class="viewcode-back" href="../../index.html#src.node.Node.addBlockToChain">[docs]</a>    <span class="k">def</span> <span class="nf">addBlockToChain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newBlock</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isNewBlockValid</span><span class="p">(</span><span class="n">newBlock</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getLatestBlock</span><span class="p">()):</span>
+            <span class="n">retVal</span> <span class="o">=</span> <span class="n">TransMethods</span><span class="o">.</span><span class="n">processTransactions</span><span class="p">(</span><span class="n">newBlock</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">getUnspentTxOuts</span><span class="p">(),</span> <span class="n">newBlock</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="c1">#getUnspentTxOuts ALSO NOT IMPLEMENTED TO_DO</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">retVal</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;block is not valid in terms of transactions&#39;</span><span class="p">);</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">blockchain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newBlock</span><span class="p">)</span>
+                <span class="n">setUnspentTxOuts</span><span class="p">(</span><span class="n">retVal</span><span class="p">)</span> <span class="c1">#TO_DO setUnspentTxOuts ALSO NOT IMPLEMENTED</span>
+                <span class="n">updateTransactionPool</span><span class="p">(</span><span class="n">unspentTxOuts</span><span class="p">)</span> <span class="c1">#TO_DO NOTHING IS IMPLEMENTED</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Node.generateRawNextBlock"><a class="viewcode-back" href="../../index.html#src.node.Node.generateRawNextBlock">[docs]</a>    <span class="k">def</span> <span class="nf">generateRawNextBlock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">transactions</span><span class="p">):</span>
+        <span class="n">newBlock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">findNextBlock</span><span class="p">(</span><span class="n">Block</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generateNextBlockHeader</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">generateNextBlockPayload</span><span class="p">(</span><span class="n">transactions</span><span class="p">)))</span></div>
+        <span class="c1">#TO_DO</span>
+
+<div class="viewcode-block" id="Node.getDifficulty"><a class="viewcode-back" href="../../index.html#src.node.Node.getDifficulty">[docs]</a>    <span class="k">def</span> <span class="nf">getDifficulty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        <span class="c1">#Calculates the current difficulty</span>
+        <span class="n">latestBlock</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blockchain</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">latestBlock</span><span class="o">.</span><span class="n">index</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">DIFFICULTY_ADJUSTMENT_INTERVAL</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="n">latestBlock</span><span class="o">.</span><span class="n">index</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">DIFFICULTY_ADJUSTMENT_INTERVAL</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span><span class="n">latestBlock</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">latestBlock</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">getAdjustedDifficulty</span><span class="p">(</span><span class="n">latestBlock</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">latestBlock</span><span class="o">.</span><span class="n">difficulty</span></div>
+
+<div class="viewcode-block" id="Node.getAdjustedDifficulty"><a class="viewcode-back" href="../../index.html#src.node.Node.getAdjustedDifficulty">[docs]</a>    <span class="k">def</span> <span class="nf">getAdjustedDifficulty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">latestBlock</span><span class="p">):</span>   <span class="c1">#Adjusts the difficulty if necessary based on hashrate</span>
+        <span class="n">prevAdjustmentBlock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blockchain</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blockchain</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">DIFFICULTY_ADJUSTMENT_INTERVAL</span><span class="p">]</span>
+        <span class="n">timeExpected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BLOCK_GENERATION_INTERVAL</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">DIFFICULTY_ADJUSTMENT_INTERVAL</span>
+        <span class="n">timeTaken</span> <span class="o">=</span> <span class="n">latestBlock</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">-</span> <span class="n">prevAdjustmentBlock</span><span class="o">.</span><span class="n">timestamp</span>
+        <span class="k">if</span> <span class="n">timeTaken</span> <span class="o">&lt;</span> <span class="n">timeExpected</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">prevAdjustmentBlock</span><span class="o">.</span><span class="n">difficulty</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">timeTaken</span> <span class="o">&gt;</span> <span class="n">timeExpected</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">prevAdjustmentBlock</span><span class="o">.</span><span class="n">difficulty</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">prevAdjustmentBlock</span><span class="o">.</span><span class="n">difficulty</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Krzysztof Orczyk Jarosław Wieczorek.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

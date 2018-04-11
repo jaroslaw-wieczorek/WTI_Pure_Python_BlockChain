@@ -3,7 +3,6 @@
 """
 Created on Sat Mar 24 18:28:44 2018
 
-@author: afar
 """
 
 

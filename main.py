@@ -36,7 +36,6 @@ h = BlockHeader(0, "previousHash_BlockHeader", 1318320, 1, 0)
 
 uT = [UnspentOutTrans(txIN[0].transOutId, txIN[0].transOutIndex, "AddressIN_UnspentOutTrans", 7), UnspentOutTrans(txIN[1].transOutId, txIN[1].transOutIndex, "2_AddressIN_UnspentOutTrans", 3)]
 
-
 n = Node()
 print(n.calculateHash(h,p))
 
@@ -47,3 +46,4 @@ print(n.verify(t,n.signTransIN(t, 0, uT)))
 
 w = Wallet(48348)
 Wallet(23)
+print(n.getCurrentTimestamp())
