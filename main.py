@@ -22,7 +22,6 @@ from src.block import Block
 from src.wallet import Wallet
 
 
-
 # Tests
 
 txIN = [TransIN("transOutIdIN_TransIN","transOutIndexIN_TransIN","signaureIN_TransIN"), TransIN("transOutIdIN_TransIN_2","transOutIndexIN_TransIN_2","signaureIN_TransIN_2")]
