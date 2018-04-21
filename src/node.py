@@ -25,10 +25,10 @@ from src.transactionMethods import TransMethods
 from src.blockHeader import BlockHeader
 from src.blockPayload import BlockPayload
 
-from Crypto.PublicKey import RSA 
-from Crypto.Signature import PKCS1_v1_5 
-from Crypto.Hash import SHA256 
-from base64 import b64encode, b64decode 
+from Crypto.PublicKey import RSA
+from Crypto.Signature import PKCS1_v1_5
+from Crypto.Hash import SHA256
+from base64 import b64encode, b64decode
 
 
 
@@ -40,12 +40,12 @@ class Node(implements(GenericNode),TransMethods):
     first_transaction = None #TO_DO add the first transaction!
     #Firstblock
     first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
-    
+
     # private key
     __key = open("rsa_keys/private", "r").read()
-    
+
     __pub_key = open("rsa_keys/key.pub", "r").read()
-    
+
     #Difficulty:
     #in seconds
     BLOCK_GENERATION_INTERVAL = 10
@@ -69,7 +69,8 @@ class Node(implements(GenericNode),TransMethods):
         h=hashlib.sha256((str(BlockHeader)+''+str(BlockPayload)).encode("utf-8"))
         return h.hexdigest()
 
-    def generateNextBlockHeader(self):          #Creates the NextBlockHeader and fills it with the appropriate values
+    def generateNextBlockHeader(self):
+        """Creates the NextBlockHeader and fills it with the appropriate values."""
         previousBlock = self.getLatestBlock()
         difficulty = self.getDifficulty()
         nonce = 0
@@ -81,7 +82,8 @@ class Node(implements(GenericNode),TransMethods):
     def generateNextBlockPayload(self, transactions): #TO_DO TRANSACTIONS AND PAYLOAD NOT YET IMPLEMENTED
         pass
 
-    def findNextBlock(self,block):    #Proof of work, finding the hash that matches the given difficulty for a block
+    def findNextBlock(self,block):
+        """Proof of work, finding the hash that matches the given difficulty for a block."""
         while True:
             nonce = 0
             hash = self.calculateHash(block.blockHeader, block.blockPayload)
@@ -91,11 +93,13 @@ class Node(implements(GenericNode),TransMethods):
                 return block
             nonce += 1
 
-    def hashDifficultyCheck(self, hash, difficulty): #Checks if the hash when written in binary starts with enough zeroes
+    def hashDifficultyCheck(self, hash, difficulty):
+        """Checks if the hash when written in binary starts with enough zeroes."""
         hashinbinary = bin(int(hash, 16))[2:].zfill(len(hash) * 4)
         return hashinbinary.startswith('0'*difficulty)
 
-    def isValidBlockStructure(self, block):         #Checks the Block fields if they contain the right types
+    def isValidBlockStructure(self, block):
+        """Checks the Block fields if they contain the right types."""
         return isinstance(block.blockHeader,BlockHeader) & \
                isinstance(block.blockPayload, BlockPayload) & \
                isinstance(block.blockHeader.index, int) & \
@@ -106,14 +110,17 @@ class Node(implements(GenericNode),TransMethods):
                isinstance(block.currentHash, str) & \
                isinstance(block.blockPayload.data, object)
 
-    def isTimestampValid(self, newBlock, previousBlock):    #Checks if the Timestamp is within the specified time
+    def isTimestampValid(self, newBlock, previousBlock):
+        """Checks if the Timestamp is within the specified time"""
         return previousBlock.blockHeader.timestamp - 60 < newBlock.blockHeader.timestamp &\
                 newBlock.blockHeader.timestamp - 60 < self.getCurrentTimestamp()
 
-    def hashMatchesBlockContent(self, block):       #Validation of the block hash
+    def hashMatchesBlockContent(self, block):
+        """Validation of the block hash"""
         return self.calculateHash(block.blockHeader, block.blockPayload) == block.currentHash
 
-    def hasValidHash(self, block):          #Checks the if the hash is correctly calculated, including difficulty
+    def hasValidHash(self, block):
+        """Checks the if the hash is correctly calculated, including difficulty."""
         if not self.hashMatchesBlockContent(block):
             print("invalid hash got:"+ block.currentHash)
             return False
@@ -123,7 +130,8 @@ class Node(implements(GenericNode),TransMethods):
         return True
 
 
-    def isNewBlockValid(self, newBlock, previousBlock): #Checks the validity of any new block
+    def isNewBlockValid(self, newBlock, previousBlock):
+        """Checks the validity of any new block."""
         if not self.isValidBlockStructure(newBlock):
             print("invalid block structure")
             return False
@@ -163,14 +171,16 @@ class Node(implements(GenericNode),TransMethods):
             return None
 
 
-    def getDifficulty(self):        #Calculates the current difficulty
+    def getDifficulty(self):
+        """Calculates the current difficulty."""
         latestBlock= self.blockchain[-1]
         if latestBlock.index % self.DIFFICULTY_ADJUSTMENT_INTERVAL == 0 & isinstance(int,latestBlock.index % self.DIFFICULTY_ADJUSTMENT_INTERVAL) & isinstance(int,latestBlock.index) & latestBlock.index != 0:
             return self.getAdjustedDifficulty(latestBlock)
         else:
             return latestBlock.difficulty
 
-    def getAdjustedDifficulty(self, latestBlock):   #Adjusts the difficulty if necessary based on hashrate
+    def getAdjustedDifficulty(self, latestBlock):
+        """Adjusts the difficulty if necessary based on the hashrate calculated from previous blocks."""
         prevAdjustmentBlock = self.blockchain[len(self.blockchain) - self.DIFFICULTY_ADJUSTMENT_INTERVAL]
         timeExpected = self.BLOCK_GENERATION_INTERVAL * self.DIFFICULTY_ADJUSTMENT_INTERVAL
         timeTaken = latestBlock.timestamp - prevAdjustmentBlock.timestamp
@@ -182,5 +192,6 @@ class Node(implements(GenericNode),TransMethods):
             return prevAdjustmentBlock.difficulty
 
     def getSumDifficulty(self, aBlockchain):
+        """Calculates the sum difficulty of a given chain."""
         return reduce((lambda x, y: x + y), list(map(lambda block: 2**block.blockHeader.difficulty, aBlockchain)))
 
