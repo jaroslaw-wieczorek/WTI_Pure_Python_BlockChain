@@ -58,19 +58,22 @@ class Node(implements(GenericNode),TransMethods):
         self.blockchain = [self.first_block]
 
     def getBlockchain(self):
+        """Returns the whole blockchain."""
         return self.blockchain
 
     def getCurrentTimestamp(self):
+        """Gets the current timestamp in a proper POSIX format (double)."""
         return datetime.datetime.now().replace(tzinfo=timezone.utc).timestamp()
     def getLatestBlock(self):
         return self.blockchain[-1]
 
     def calculateHash(self, BlockHeader, BlockPayload): #TO_DO FIX THIS
+        """Calculates the hash for the supplied BlockHeader and BlockPayload."""
         h=hashlib.sha256((str(BlockHeader)+''+str(BlockPayload)).encode("utf-8"))
         return h.hexdigest()
 
     def generateNextBlockHeader(self):
-        """Creates the NextBlockHeader and fills it with the appropriate values."""
+        """Creates the NextBlockHeader based on the current chain and fills it with the appropriate values."""
         previousBlock = self.getLatestBlock()
         difficulty = self.getDifficulty()
         nonce = 0
@@ -83,7 +86,7 @@ class Node(implements(GenericNode),TransMethods):
         pass
 
     def findNextBlock(self,block):
-        """Proof of work, finding the hash that matches the given difficulty for a block."""
+        """Proof of work, finds the hash that matches the given difficulty for a block."""
         while True:
             nonce = 0
             hash = self.calculateHash(block.blockHeader, block.blockPayload)
@@ -116,7 +119,7 @@ class Node(implements(GenericNode),TransMethods):
                 newBlock.blockHeader.timestamp - 60 < self.getCurrentTimestamp()
 
     def hashMatchesBlockContent(self, block):
-        """Validation of the block hash"""
+        """Validation of the block hash."""
         return self.calculateHash(block.blockHeader, block.blockPayload) == block.currentHash
 
     def hasValidHash(self, block):
@@ -149,6 +152,7 @@ class Node(implements(GenericNode),TransMethods):
 
     #Missing functions, do not use
     def addBlockToChain(self, newBlock):
+        """Attempts to add a supplied block to the chain. Checks the necessary requirements, processes transactions, sets UnspentTXOuts and updates the Pool."""
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
             retVal = TransMethods.processTransactions(newBlock.data, getUnspentTxOuts(), newBlock.index) #getUnspentTxOuts ALSO NOT IMPLEMENTED TO_DO
             if retVal == None:
@@ -163,6 +167,7 @@ class Node(implements(GenericNode),TransMethods):
         return False
 
     def generateRawNextBlock(self,transactions):
+        """Creates the block, fills it with supplied transactions and attempts to add it to the chain and broadcast the success."""
         newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))
         if self.addBlockToChain(newBlock):
             self.broadcastLatest() #TO_DO not implemented
