@@ -143,7 +143,7 @@ class Node(implements(GenericNode),TransMethods):
     def addBlockToChain(self, newBlock):
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
             retVal = TransMethods.processTransactions(newBlock.data, getUnspentTxOuts(), newBlock.index) #getUnspentTxOuts ALSO NOT IMPLEMENTED TO_DO
-            if (retVal == None):
+            if retVal == None:
                 print('block is not valid in terms of transactions');
                 return False
             else:
@@ -156,7 +156,12 @@ class Node(implements(GenericNode),TransMethods):
 
     def generateRawNextBlock(self,transactions):
         newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))
-        #TO_DO
+        if self.addBlockToChain(newBlock):
+            self.broadcastLatest() #TO_DO not implemented
+            return newBlock
+        else:
+            return None
+
 
     def getDifficulty(self):        #Calculates the current difficulty
         latestBlock= self.blockchain[-1]
