@@ -65,7 +65,8 @@
 <dl class="method">
 <dt id="src.node.Node.findNextBlock">
 <code class="descname">findNextBlock</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.findNextBlock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.findNextBlock" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Proof of work, finding the hash that matches the given difficulty for a block.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="src.node.Node.first_block">
@@ -80,7 +81,8 @@
 <dl class="method">
 <dt id="src.node.Node.generateNextBlockHeader">
 <code class="descname">generateNextBlockHeader</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.generateNextBlockHeader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.generateNextBlockHeader" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Creates the NextBlockHeader and fills it with the appropriate values.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.node.Node.generateNextBlockPayload">
@@ -95,7 +97,8 @@
 <dl class="method">
 <dt id="src.node.Node.getAdjustedDifficulty">
 <code class="descname">getAdjustedDifficulty</code><span class="sig-paren">(</span><em>latestBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.getAdjustedDifficulty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.getAdjustedDifficulty" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Adjusts the difficulty if necessary based on the hashrate calculated from previous blocks.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.node.Node.getBlockchain">
@@ -110,7 +113,8 @@
 <dl class="method">
 <dt id="src.node.Node.getDifficulty">
 <code class="descname">getDifficulty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.getDifficulty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.getDifficulty" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Calculates the current difficulty.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.node.Node.getLatestBlock">
@@ -118,34 +122,46 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="src.node.Node.getSumDifficulty">
+<code class="descname">getSumDifficulty</code><span class="sig-paren">(</span><em>aBlockchain</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.getSumDifficulty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.getSumDifficulty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the sum difficulty of a given chain.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="src.node.Node.hasValidHash">
 <code class="descname">hasValidHash</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.hasValidHash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.hasValidHash" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Checks the if the hash is correctly calculated, including difficulty.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.node.Node.hashDifficultyCheck">
 <code class="descname">hashDifficultyCheck</code><span class="sig-paren">(</span><em>hash</em>, <em>difficulty</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.hashDifficultyCheck"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.hashDifficultyCheck" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Checks if the hash when written in binary starts with enough zeroes.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.node.Node.hashMatchesBlockContent">
 <code class="descname">hashMatchesBlockContent</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.hashMatchesBlockContent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.hashMatchesBlockContent" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Validation of the block hash</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.node.Node.isNewBlockValid">
 <code class="descname">isNewBlockValid</code><span class="sig-paren">(</span><em>newBlock</em>, <em>previousBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.isNewBlockValid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.isNewBlockValid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Checks the validity of any new block.</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.node.Node.isTimestampValid">
 <code class="descname">isTimestampValid</code><span class="sig-paren">(</span><em>newBlock</em>, <em>previousBlock</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.isTimestampValid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.isTimestampValid" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Checks if the Timestamp is within the specified time</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="src.node.Node.isValidBlockStructure">
 <code class="descname">isValidBlockStructure</code><span class="sig-paren">(</span><em>block</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/node.html#Node.isValidBlockStructure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.node.Node.isValidBlockStructure" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Checks the Block fields if they contain the right types.</p>
+</dd></dl>
 
 </dd></dl>
 

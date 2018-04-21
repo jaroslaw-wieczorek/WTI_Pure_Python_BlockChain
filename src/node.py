@@ -37,7 +37,7 @@ class Node(implements(GenericNode),TransMethods):
     '''
     #Constant variables:
     #Firsttransaction
-    first_transaction = None #TO_DO add the first transaction!
+    first_transaction = Transaction("FIRST_TRANS_ID", TransIN("", "", ""), TransOUT("MY_ADDRESS", 50)) #TO_DO still not final
     #Firstblock
     first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
 
