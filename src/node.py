@@ -195,3 +195,10 @@ class Node(implements(GenericNode),TransMethods):
         """Calculates the sum difficulty of a given chain."""
         return reduce((lambda x, y: x + y), list(map(lambda block: 2**block.blockHeader.difficulty, aBlockchain)))
 
+    def generateNextBlock(self):
+        """Creates a Coinbase transaction then adds the transactions awaiting in the Transaction Pool, lastly it uses generateRawNextBlock to create the actual block."""
+        coinbaseTx = getCoinbaseTransaction(getPublicFromWallet(), self.getLatestBlock().index + 1) #getCoinbaseTransaction should be imported from transactionMethods
+        blockData = [coinbaseTx] + getTransactionPool() #Transaction Pool is stil a long way
+        return self.generateRawNextBlock(blockData)
+
+
