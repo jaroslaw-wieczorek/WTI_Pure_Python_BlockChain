@@ -38,18 +38,24 @@ class TransMethods():
     
     def getTransactionId(self, transaction: Transaction) -> str:
         
-        
-        #
-        transINContent : str = reduce(lambda x,y:  x+y, map(self.concIN, transaction.transIN))    
-        transOUTContent : str = reduce(lambda x,y:  x+y, map(self.concOUT, transaction.transOUT))
+        # Concatenate data from transIN objects list: 
+        # transOutId & transOutIndexand reduce to one string
+        transINContent : str = reduce(lambda x,y:  x+y, 
+                                      map(self.concIN, transaction.transIN))    
        
+        # Concatenate data from transOUT objects list: 
+        # transOutId & transOutIndexand reduce to one string
+        transOUTContent : str = reduce(lambda x,y:  x+y, map(
+                self.concOUT, transaction.transOUT))
+       
+        # Create hash - id of transaction
         h=hashlib.sha256((transINContent+transOUTContent).encode("utf-8"))
    
         print(h.hexdigest())      
         return h.hexdigest() #return string 
     
     
-    def validateTransaction(self, transaction:Transaction, aUnspentOutTrans:UnspentOutTrans):
+    def validateTransaction(self, transaction:Transaction, aUnspentOutTrans:UnspentOutTrans) -> bool:
        
         if not self.isValidTransactionStructure(transaction):
             return False
@@ -58,23 +64,53 @@ class TransMethods():
             print("[*] Invalid tx id: " + transaction.transID)
             return False
         
-        hasValidTransINs : bool = reduce((lambda transIn: 
-                                            self.validateTransIN(transIn,
-                                            transaction, aUnspentOutTrans), 
-                                            transaction.transIN
-                                        ))
-                                            
-       # reduce(lambda x,y:  x&&y, map(self.validateTransIn, transaction.transIN))
-                                    
-        print(hasValidTransINs)
-        
+        # Two lambda functions labda x,y, x and y  - prepare logic values to reduce
+        # Next lambda preprare list fo first with results of validateTransIN    
+        hasValidTransINs : bool = reduce(lambda x,y: x and y,
+                                  list(map(lambda transIn: self.validateTransIN(transIn, transaction, aUnspentOutTrans) , transaction.transIN, default=True)))                               
+                
         if not hasValidTransINs:
              print('[*] some of the transINs are invalid in trans: ' + transaction.transID);
              return False
         
-         
-        totalTransInValues : float = reduce((lambda x,y: self.getTransInAmount(x, aUnspentOutTrans) + self.getTransInAmount(y, aUnspentOutTrans), transaction.transIn))
         
+       
+        totalTransInValues : float = reduce(lambda x,y: x + y, 
+                                     list(map(lambda transIn: self.getTransInAmount(transIn, aUnspentOutTrans), transaction.transIn)))
+        
+        # get all OutMoney
+        totalTransOutValues : float = reduce(lambda x, y: x + y, map(self.getTransOutAmount,  transaction.transOut))
+          
+        # check 
+        if totalTransOutValues != totalTransInValues:
+            print('totalTransOutValues != totalTransInValues in tx: ' + transaction.id)
+        return False;
+
+
+    def validateBlockTransactions(self,aTransactions, aUnspentTxOuts, blockIndex):
+        coinbaseTx = aTransactions[0]
+        if not self.validateCoinbaseTx(self,coinbaseTx, blockIndex):
+            print('invalid coinbase transaction: ' + coinbaseTx)
+            return False
+
+        # check for duplicate txIns. Each txIn can be included only once
+        txIns = list(map(lambda x: x.transIN, aTransactions))
+
+        if len(txIns) != len(set(txIns)):
+            return False
+
+
+        # all but coinbase transactions
+        normalTransactions = aTransactions[1:]
+        return reduce((lambda a, b: a & b), list(map(lambda tx: self.validateTransaction(tx, aUnspentTxOuts), normalTransactions)), True)
+
+        
+      
+    def getTransOutAmount(transOut : TransOUT):
+        return transOut.amount
+    
+    def getTransInAmount(transIn : TransIN, aUnspentOutTrans : UnspentOutTrans) :
+        pass
     
     # To do: implement
     def isValidTransactionStructure(self, transaction:Transaction):
@@ -99,8 +135,8 @@ class TransMethods():
  
         if referencedUnTransOut == None:
             print('[*] referenced transOut not found: ' + str(transIn))
-        return False
-       
+            return False
+        
         
         # TO check ! 
         address = referencedUnTransOut.address;
@@ -207,23 +243,7 @@ class TransMethods():
             return False
         return True
 
-    def validateBlockTransactions(self,aTransactions, aUnspentTxOuts, blockIndex):
-        coinbaseTx = aTransactions[0]
-        if not self.validateCoinbaseTx(self,coinbaseTx, blockIndex):
-            print('invalid coinbase transaction: ' + coinbaseTx)
-            return False
-
-        # check for duplicate txIns. Each txIn can be included only once
-        txIns = list(map(lambda x: x.transIN, aTransactions))
-
-        if len(txIns) != len(set(txIns)):
-            return False
-
-
-        # all but coinbase transactions
-        normalTransactions = aTransactions[1:]
-        return reduce((lambda a, b: a & b), list(map(lambda tx: self.validateTransaction(tx, aUnspentTxOuts), normalTransactions)), True)
-
+    
     def processTransactions(self, aTransactions, aUnspentTxOuts, blockIndex):
         if not self.validateBlockTransactions(aTransactions, aUnspentTxOuts, blockIndex):
             print('invalid block transactions')
