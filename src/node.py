@@ -9,8 +9,8 @@ Created on Sat Mar 24 18:27:18 2018
 import datetime
 from datetime import timezone
 import hashlib
-
-from interface import implements 
+from functools import reduce
+from interface import implements
 from src.generics.interfaces import GenericNode
 
 
@@ -143,7 +143,7 @@ class Node(implements(GenericNode),TransMethods):
     def addBlockToChain(self, newBlock):
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
             retVal = TransMethods.processTransactions(newBlock.data, getUnspentTxOuts(), newBlock.index) #getUnspentTxOuts ALSO NOT IMPLEMENTED TO_DO
-            if (retVal == None):
+            if retVal == None:
                 print('block is not valid in terms of transactions');
                 return False
             else:
@@ -156,7 +156,12 @@ class Node(implements(GenericNode),TransMethods):
 
     def generateRawNextBlock(self,transactions):
         newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))
-        #TO_DO
+        if self.addBlockToChain(newBlock):
+            self.broadcastLatest() #TO_DO not implemented
+            return newBlock
+        else:
+            return None
+
 
     def getDifficulty(self):        #Calculates the current difficulty
         latestBlock= self.blockchain[-1]
@@ -175,3 +180,7 @@ class Node(implements(GenericNode),TransMethods):
             return prevAdjustmentBlock.difficulty - 1
         else:
             return prevAdjustmentBlock.difficulty
+
+    def getSumDifficulty(self, aBlockchain):
+        return reduce((lambda x, y: x + y), list(map(lambda block: 2**block.blockHeader.difficulty, aBlockchain)))
+
