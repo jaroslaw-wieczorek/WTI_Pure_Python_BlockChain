@@ -30,6 +30,7 @@ from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA256
 from base64 import b64encode, b64decode
 
+from src.utilities import Utilities
 
 
 class Node(implements(GenericNode),TransMethods):
@@ -206,4 +207,19 @@ class Node(implements(GenericNode),TransMethods):
         blockData = [coinbaseTx] + getTransactionPool() #Transaction Pool is stil a long way
         return self.generateRawNextBlock(blockData)
 
+    def validateBlockChain(self, blockchaintovalidate: []) -> []:
+        """Checks the validity of a given blockchain, return unspent txOuts if it is valid."""
+        if not str(blockchaintovalidate[0]) == str(self.first_block):
+            print("This is not even the correct blockchain are you even trying?")
+            return None
+        #Block is valid if the structure is valid and the transactions are valid.
+        aUnspentTxOuts = []
+        for previousBlock, currentBlock, nxtBlock in Utilities.previous_and_next(blockchaintovalidate):
+            if not previousBlock == None and not self.isNewBlockValid(currentBlock, previousBlock):
+                return None
 
+            aUnspentTxOuts = processTransactions(currentBlock.data, aUnspentTxOuts, currentBlock.index) #TO_DO should be imported from transactionsMethods
+            if aUnspentTxOuts == None:
+                print("Invalid transactions")
+                return None
+        return aUnspentTxOuts
