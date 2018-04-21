@@ -36,22 +36,61 @@ class TransMethods():
         return str(x.address) + '' +str(x.amount)
     
     
-    def getTransactionId(self, transactions: Transaction) -> str:
-        txInContent = ""
-        for x in transactions.transIN:
-            txInContent += self.concIN(x)
-         
-        txOutContent = ""
-        for x in transactions.transOUT:
-            txOutContent += self.concOUT(x)
-        h=hashlib.sha256((txInContent+txOutContent).encode("utf-8"))
+    def getTransactionId(self, transaction: Transaction) -> str:
+        
+        
+        #
+        transINContent : str = reduce(lambda x,y:  x+y, map(self.concIN, transaction.transIN))    
+        transOUTContent : str = reduce(lambda x,y:  x+y, map(self.concOUT, transaction.transOUT))
+       
+        h=hashlib.sha256((transINContent+transOUTContent).encode("utf-8"))
    
         print(h.hexdigest())      
         return h.hexdigest() #return string 
     
     
+    def validateTransaction(self, transaction:Transaction, aUnspentOutTrans:UnspentOutTrans):
+       
+        if not self.isValidTransactionStructure(transaction):
+            return False
+        
+        if self.getTransactionId(transaction) != transaction.transID:
+            print("[*] Invalid tx id: " + transaction.transID)
+            return False
+        
+        hasValidTransINs : bool = reduce((lambda transIn: 
+                                            self.validateTransIN(transIn,
+                                            transaction, aUnspentOutTrans), 
+                                            transaction.transIN
+                                        ))
+                                            
+       # reduce(lambda x,y:  x&&y, map(self.validateTransIn, transaction.transIN))
+                                    
+        print(hasValidTransINs)
+        
+        if not hasValidTransINs:
+             print('[*] some of the transINs are invalid in trans: ' + transaction.transID);
+             return False
+        
+         
+        totalTransInValues : float = reduce((lambda x,y: self.getTransInAmount(x, aUnspentOutTrans) + self.getTransInAmount(y, aUnspentOutTrans), transaction.transIn))
+        
+    
     # To do: implement
     def isValidTransactionStructure(self, transaction:Transaction):
+       
+        if not type(transaction.id, str):
+            print('transactionId missing')
+            return False
+        
+        if not isinstance(transaction.TransIN, list):
+            print('invalid TransIns type in transaction')
+            return False
+        
+        if not reduce(isValidTransOutStructure, transcation.transOUT):
+            return False
+        
+        
         return True
     
    
@@ -95,31 +134,11 @@ class TransMethods():
     
     
     
-    def validateTransaction(self, transaction:Transaction, aUnspentOutTrans:UnspentOutTrans):
-       
-        if not self.isValidTransactionStructure(transaction):
-            return False
-        
-        if self.getTransactionId(transaction) != transaction.transID:
-            print("[*] Invalid tx id: " + transaction.transID)
-            return False
-        
-        hasValidTransINs : bool = reduce((lambda transIn: 
-                                            self.validateTransIN(transIn,
-                                            transaction, aUnspentOutTrans), 
-                                            transaction.transIN
-                                        ))
-        print(hasValidTransINs)
-        
-        if not hasValidTransINs:
-             print('[*] some of the transINs are invalid in trans: ' + transaction.transID);
-             return False
-         
-        totalTransInValues : float = reduce((lambda x,y: self.getTransInAmount(x, aUnspentOutTrans) + self.getTransInAmount(y, aUnspentOutTrans), transaction.transIn))
-        
+   
 
 
     def newUnspentOutTrans(self):
+        
         pass
         
         
