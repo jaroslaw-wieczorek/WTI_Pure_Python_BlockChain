@@ -9,8 +9,8 @@ Created on Sat Mar 24 18:27:18 2018
 import datetime
 from datetime import timezone
 import hashlib
-
-from interface import implements 
+from functools import reduce
+from interface import implements
 from src.generics.interfaces import GenericNode
 
 
@@ -180,3 +180,7 @@ class Node(implements(GenericNode),TransMethods):
             return prevAdjustmentBlock.difficulty - 1
         else:
             return prevAdjustmentBlock.difficulty
+
+    def getSumDifficulty(self, aBlockchain):
+        return reduce((lambda x, y: x + y), list(map(lambda block: 2**block.blockHeader.difficulty, aBlockchain)))
+

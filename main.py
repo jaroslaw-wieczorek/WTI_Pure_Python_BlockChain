@@ -38,6 +38,7 @@ p = BlockPayload(t)
 h = BlockHeader(0, "previousHash_BlockHeader", 1318320, 1, 0)
 
 b = Block(h,p)
+#b2 = Block(h,p)
 
 
 
@@ -46,7 +47,8 @@ uT = [UnspentOutTrans(txIN[0].transOutId, txIN[0].transOutIndex, "AddressIN_Unsp
 
 n = Node()
 #print(n.calculateHash(h,p))
-
+#print("Difficulty")
+#print(n.getSumDifficulty([b,b2]))
 
 #n.findNextBlock(b)
 #print(n.signTransIN(t, 0, uT))
