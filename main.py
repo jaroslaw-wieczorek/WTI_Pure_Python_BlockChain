@@ -39,7 +39,7 @@ h = BlockHeader(0, "previousHash_BlockHeader", 1318320, 1, 0)
 
 b = Block(h,p)
 #b2 = Block(h,p)
-
+#print(b)
 
 
 
