@@ -55,6 +55,7 @@ class TransMethods():
         return h.hexdigest() #return string 
     
     
+    
     def validateTransaction(self, transaction:Transaction, aUnspentOutTrans:UnspentOutTrans) -> bool:
        
         if not self.isValidTransactionStructure(transaction):
@@ -72,7 +73,6 @@ class TransMethods():
         if not hasValidTransINs:
              print('[*] some of the transINs are invalid in trans: ' + transaction.transID);
              return False
-        
         
        
         totalTransInValues : float = reduce(lambda x,y: x + y, 
