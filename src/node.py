@@ -223,3 +223,18 @@ class Node(implements(GenericNode),TransMethods):
                 print("Invalid transactions")
                 return None
         return aUnspentTxOuts
+
+    def replaceChain(self, newBlocks):
+        """If the Node receives a new blockchain this is used to verify and replace it if necessary."""
+        aUnspentTxOuts = self.isValidChain(newBlocks)
+        if aUnspentTxOuts is not None: validChain = True
+
+        if validChain and self.getSumDifficulty(newBlocks) > self.getSumDifficulty(self.getBlockchain()):
+            print("Received a better blockchain, exchanging it for your old one for free!")
+            self.blockchain = newBlocks
+            setUnspentTxOuts(aUnspentTxOuts)        #TO_DO
+            updateTransactionPool(unspentTxOuts)    #TO_DO
+            broadcastLatest()                       #TO_DO
+        else:
+            print("Received a new blockchain but it doesn't look good. In to the trash it goes")
+
