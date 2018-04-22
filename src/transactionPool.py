@@ -16,3 +16,7 @@ class TransactionPool:
         print(transaction)
         self.transactionPool.append(transaction)
 
+    def hasTxIn(self, txIn, unspentTxOuts):
+        foundTxIn = [x for x in unspentTxOuts if x.txOutId == txIn.txOutId and x.txOutIndex == txIn.txOutIndex][0]
+        if foundTxIn:   #TO_DO Verify if this works properly.
+            return True
