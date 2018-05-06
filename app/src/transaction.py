@@ -6,7 +6,7 @@ Created on Sat Mar 24 18:27:37 2018
 """
 
 from interface import implements
-from src.generics.interfaces import GenericTransaction
+from .generics.interfaces import GenericTransaction
 
 
 class Transaction(implements(GenericTransaction)):

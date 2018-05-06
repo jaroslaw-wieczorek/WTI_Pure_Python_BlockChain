@@ -5,32 +5,32 @@
 Created on Sat Mar 24 18:27:18 2018
 
 """
-
+import sys
 import datetime
 from datetime import timezone
 import hashlib
 from functools import reduce
 from interface import implements
-from src.generics.interfaces import GenericNode
 
 
-from src.wallet import Wallet
-from src.block import Block
-from src.transIN import TransIN
-from src.transOUT import TransOUT
-from src.transaction import Transaction
-from src.unspentOutTrans import UnspentOutTrans
-from src.transactionMethods import TransMethods
+from .generics.interfaces import GenericNode
+from .wallet import Wallet
+from .block import Block
+from .transIN import TransIN
+from .transOUT import TransOUT
+from .utilities import Utilities
+from .transaction import Transaction
+from .unspentOutTrans import UnspentOutTrans
+from .transactionMethods import TransMethods
 
-from src.blockHeader import BlockHeader
-from src.blockPayload import BlockPayload
+from .blockHeader import BlockHeader
+from .blockPayload import BlockPayload
 
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA256
 from base64 import b64encode, b64decode
 
-from src.utilities import Utilities
 
 
 class Node(implements(GenericNode),TransMethods):

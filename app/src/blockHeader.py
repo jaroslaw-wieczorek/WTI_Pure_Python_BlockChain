@@ -5,7 +5,7 @@ Created on Sat Mar 24 18:28:38 2018
 
 """
 from interface import implements
-from src.generics.interfaces import GenericBlockHeader
+from .generics.interfaces import GenericBlockHeader
 
                 
 class BlockHeader(implements(GenericBlockHeader)):

@@ -2,7 +2,7 @@
 
 from interface import implements
 
-from src.generics.interfaces import UI
+from .generics.interfaces import UI
 
 
 class Wallet(implements(UI)):

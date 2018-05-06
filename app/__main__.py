@@ -9,19 +9,34 @@ Created on Thu Mar 22 11:38:34 2018
 
 import unittest
 import hashlib
+
+from .src.node import Node
+
+from .src.transIN import TransIN
+from .src.transOUT import TransOUT
+from .src.transaction import Transaction
+from .src.unspentOutTrans import UnspentOutTrans
+from .src.blockPayload import BlockPayload
+from .src.blockHeader import BlockHeader
+from .src.block import Block
+from .src.wallet import Wallet
+
+
 import sys
-sys.path += ['src/generics']
+#sys.path += ['src/generics']
 
-from src.node import Node
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
-from src.transIN import TransIN
-from src.transOUT import TransOUT
-from src.transaction import Transaction
-from src.unspentOutTrans import UnspentOutTrans
-from src.blockPayload import BlockPayload
-from src.blockHeader import BlockHeader
-from src.block import Block
-from src.wallet import Wallet
+from .gui.mainwindow_ui import Ui_MainWindow
+
+class MainWindow(QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.setupUi(self)
+
+
+
+
 
 # Tests
 
@@ -129,5 +144,17 @@ class UntitledCoinTest(unittest.TestCase):
     
 
 
-if __name__ == '__main__':
+def main():
+    app = QApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.show()
+    sys.exit(app.exec_())
+    
+
+if __name__ == "__main__":
     unittest.main()
+    main()
+
+
+
+    
