@@ -8,39 +8,45 @@ class TransactionPool:
         """Returns the local pool of Transactions."""
         return deepcopy(self.transactionPool)
 
-    def addToTransactionPool(self, transaction, unspentTxOuts):
+    def getTransactionPoolIns(self, xTransactionPool):
+        """Returns all transaction ins for the given TransactionPool."""
+        return list(map(lambda trans: [item for sublist in trans.transIN for item in sublist], xTransactionPool))
+        #Fast Python flatten:
+        #https://stackoverflow.com/a/952952
+
+    def addToTransactionPool(self, transaction, unspentTransOuts):
         """Adds transactions to the Pool, validates before hand."""
-        if not validateTransaction(transaction, unspentTxOuts):
-            raise ValueError("Invalid tx, can not add.")
-        if not isValidTxForPool(transaction, self.transactionPool):
-            raise ValueError("Invalid tx, can not add.")
+        if not validateTransaction(transaction, unspentTransOuts):
+            raise ValueError("Invalid trans, can not add.")
+        if not isValidTransForPool(transaction, self.transactionPool):
+            raise ValueError("Invalid trans, can not add.")
         print("Adding to the pool")
         print(transaction)
         self.transactionPool.append(transaction)
 
-    def hasTxIn(self, txIn, unspentTxOuts):
-        """Returns True if txIn Id and Index exist in the unspentTxOuts."""
-        foundTxIn = [x for x in unspentTxOuts if x.txOutId == txIn.txOutId and x.txOutIndex == txIn.txOutIndex][0]
-        if foundTxIn:   #TO_DO Verify if this works properly.
+    def hasTransIn(self, transIn, unspentTransOuts):
+        """Returns True if transIn Id and Index exist in the unspentransOuts."""
+        foundTransIn = [x for x in unspentTransOuts if x.transOutId == transIn.transOutId and x.transOutIndex == transIn.transOutIndex][0]
+        if foundTransIn:   #TO_DO Verify if this works properly.
             return True
 
-    def updateTransactionPool(self, unspentTxOut):
+    def updateTransactionPool(self, unspentTransOut):
         """Updates the pool by removing invalid transactions.
         Invalid transactions can be:
         *Transactions already mined,
         *The unspent out was spent by some other transaction, making this one invalid."""
 
-        invalidTxs = []
-        for tx in self.transactionPool:
-            for txIn in tx.transIN:
-                if not self.hasTxIn(txIn, unspentTxOut):
-                    invalidTxs.append(tx)
+        invalidTransactions = []
+        for trans in self.transactionPool:
+            for transIn in trans.transIN:
+                if not self.hasTransIn(transIn, unspentTransOut):
+                    invalidTransactions.append(trans)
                     break
-        if len(invalidTxs) > 0:
+        if len(invalidTransactions) > 0:
             print("Removing transactions from the Pool:")
-            print(invalidTxs)
+            print(invalidTransactions)
             print("They where probably mined or spent elsewhere.")
-            self.transactionPool = list(set(self.transactionPool)-set(invalidTxs))
+            self.transactionPool = list(set(self.transactionPool)-set(invalidTransactions))
             #We should not have duplicate values, and this approach is suprisingly fast!
             #252s vs 0.75s for 500000 array.
             #Which is a good thing because theoretically we could have very big lists here.
