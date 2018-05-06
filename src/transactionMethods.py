@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-
+import re
 import hashlib
 import datetime
+import binascii
+import operator 
 from datetime import timezone
 from functools import reduce
-
 
 from src.transIN import TransIN
 from src.transOUT import TransOUT
@@ -19,15 +20,11 @@ from base64 import b64encode, b64decode
 
 class TransMethods():
     
-    __key = open("rsa_keys/private", "r").read()
-    __pub_key = open("rsa_keys/key.pub", "r").read()
-    
+
     
     def __init__(self):
-        self.__key = open("rsa_keys/private", "r").read()
-
+        self.__key = open("rsa_keys/key", "r").read()
         self.__pub_key = open("rsa_keys/key.pub", "r").read()
-    
     
     def concIN(self, x):
         return str(x.transOutId) + '' +str(x.transOutIndex)
@@ -42,12 +39,12 @@ class TransMethods():
         # Concatenate data from transIN objects list: 
         # transOutId & transOutIndexand reduce to one string
         transINContent : str = reduce(lambda x,y:  x+y, 
-                                      map(self.concIN, transaction.transIN))    
+                                      map(self.concIN, transaction.transINs))    
        
         # Concatenate data from transOUT objects list: 
         # transOutId & transOutIndexand reduce to one string
         transOUTContent : str = reduce(lambda x,y:  x+y, 
-                                       map(self.concOUT, transaction.transOUT))
+                                       map(self.concOUT, transaction.transOUTs))
        
         # Create hash - id of transaction
         h=hashlib.sha256((transINContent+transOUTContent).encode("utf-8"))
@@ -70,11 +67,11 @@ class TransMethods():
         # Two lambda functions labda x,y, x and y  - prepare logic values to reduce
         # Next lambda preprare list fo first with results of validateTransIN    
         hasValidInTrans : bool = reduce(lambda x,y: x and y,
-                                list(map(lambda transIn: 
-                                    self.validateTransIN(transIn, 
+                                list(map(lambda transIN: 
+                                    self.validateTransIN(transIN, 
                                                          transaction, 
                                                          aUnspentOutTrans),
-                                                         transaction.transIN,
+                                                         transaction.transINs,
                                                          default=True)))                               
             
         if not hasValidInTrans:
@@ -84,14 +81,14 @@ class TransMethods():
        
         # get all InMoney
         totalInTransValues : float = reduce(lambda x,y: x + y, 
-                                     list(map(lambda transIn: self.getTransInAmount(transIn, aUnspentOutTrans), transaction.transIn)))
+                                     list(map(lambda transIN: self.getTransInAmount(transIN, aUnspentOutTrans), transaction.transINs)))
         
         # get all OutMoney
-        totalOutTransValues : float = reduce(lambda x, y: x + y, map(self.getTransOutAmount,  transaction.transOut))
+        totalOutTransValues : float = reduce(lambda x, y: x + y, map(self.getTransOutAmount,  transaction.transOUTs))
           
         # check 
         if totalOutTransValues != totalInTransValues:
-            print('totalOutTransValues != totalInTransValues in tx: ' + transaction.id)
+            print('totalOutTransValues != totalInTransValues in tx: ' + transaction.transID)
         return False;
 
 
@@ -105,7 +102,7 @@ class TransMethods():
 
         # check for duplicate txIns. Each txIn can be included only once
         
-        transIns = list(map(lambda x: x.transIN, aTransactions))
+        transIns = list(map(lambda x: x.transINs, aTransactions))
         
         #Check dupliactes 1
         if self.hasDupliactes(transIns):
@@ -140,30 +137,30 @@ class TransMethods():
         if self.getTransactionId(transaction) != transaction.transID :
             print('invalid coinbase tx id: ' + transaction.transID)
             return False
-        if transaction.transIN.length != 1:
+        if transaction.transINs.length != 1:
             print('one transIn must be specified in the coinbase transaction')
             return False
 
-        if transaction.transIN[0].transOutIndex != blockIndex:
+        if transaction.transINs[0].transOutIndex != blockIndex:
             print('the txIn signature in coinbase tx must be the block height')
             return False
 
-        if len(transaction.transOUT) != 1:
+        if len(transaction.transOUTs) != 1:
             print('invalid number of transOut in coinbase transaction')
             return False
 
-        if transaction.transOUT[0].amount != self.COINBASE_AMOUNT:
+        if transaction.transOUTs[0].amount != self.COINBASE_AMOUNT:
             print('invalid coinbase amount in coinbase transaction')
             return False
         return True
     
 
 
-    def validateInTrans(self, transIn:TransIN, transaction:Transaction, aUnspentOutTrans : UnspentOutTrans) -> bool:
-        referencedUnTransOut: UnspentOutTrans = aUnspentOutTrans.find([lambda uTransOut: uTransOut in uTransOut.transOutId == transIn.transOutId and uTransOut.transOutIndex == transIn.transOutIndex])
+    def validateInTrans(self, transIN:TransIN, transaction:Transaction, aUnspentOutTrans : UnspentOutTrans) -> bool:
+        referencedUnTransOut: UnspentOutTrans = aUnspentOutTrans.find([lambda uTransOut: uTransOut in uTransOut.transOutId == transIN.transOutId and uTransOut.transOutIndex == transIN.transOutIndex])
  
         if referencedUnTransOut == None:
-            print('[*] referenced transOut not found: ' + str(transIn))
+            print('[*] referenced transOut not found: ' + str(transIN))
             return False
         
         # TO check ! 
@@ -176,7 +173,7 @@ class TransMethods():
         dataToVerify = (transaction.transID)
         newHash.update(dataToVerify.encode("utf-8"))
         
-        validSignature : bool = signer.verify(newHash, transIn.signature)
+        validSignature : bool = signer.verify(newHash, transIN.signature)
         
         if not validSignature:
             print("Invalid transIn signature: %s transId: %s address: %s" % transIn.signature, transaction.id, referencedUnTransOut.address)
@@ -184,8 +181,8 @@ class TransMethods():
         return True
     
         
-    def getTransInAmount(self, transIn : TransIN, aUnspentOutTrans : UnspentOutTrans) -> float:
-        return self.findUnspentTransOut(transIn.transOutId, transIn.transOutIndex, aUnspentOutTrans).amount;
+    def getTransInAmount(self, transIN : TransIN, aUnspentOutTrans : UnspentOutTrans) -> float:
+        return self.findUnspentOutTrans(transIN.transOutId, transIN.transOutIndex, aUnspentOutTrans).amount;
     
     
     
@@ -194,8 +191,8 @@ class TransMethods():
     
     
     
-    def findUnspentOutTrans(self, transOutId: str, transOutIndex: int, aUnspentTransOut: UnspentOutTrans):
-        for uTransOut in aUnspentTransOut:
+    def findUnspentOutTrans(self, transOutId: str, transOutIndex: int, aUnspentOutTrans: UnspentOutTrans):
+        for uTransOut in aUnspentOutTrans:
             if uTransOut.transOutId == transOutId and uTransOut.transOutIndex == transOutIndex:
                 return uTransOut
     
@@ -207,19 +204,18 @@ class TransMethods():
         newtransIN.transOutId = ''
         newtransIN.transOutIndex = blockIndex
         
-        t.transIN = [newtransIN]
-        t.transOUT = [TransOUT(address, self.COINBASE_AMOUNT)];
+        t.transINs = [newtransIN]
+        t.transOUTs = [TransOUT(address, self.COINBASE_AMOUNT)];
         t.transID = self.getTransactionId(t);
         
         return t;
     
-    
    
     def signTransIN(self, transaction: Transaction, transInIndex: int, aUnspentOutTrans: UnspentOutTrans):
         
-        transIn : TransIN = transaction.transIN[transInIndex]
+        transIN : TransIN = transaction.transINs[transInIndex]
         dataToSign = str(transaction.transID)
-        referencedUnspentOutTrans : UnspentOutTrans = self.findUnspentTransOut(transIn.transOutId, transIn.transOutIndex, aUnspentOutTrans)
+        referencedUnspentOutTrans : UnspentOutTrans = self.findUnspentOutTrans(transIN.transOutId, transIN.transOutIndex, aUnspentOutTrans)
 
         
         if referencedUnspentOutTrans is None:
@@ -244,41 +240,144 @@ class TransMethods():
         signature : str = signer.sign(newHash)
       
         return signature 
+   
+    
+    def updateUnspentOutTrans(self, aTransactions : list, aUnspentOutsTrans : UnspentOutTrans) -> UnspentOutTrans:
+
+        # t - Transaction
+        newUnSpentOutsTrans_elements = []
+        for t in aTransactions:
+            for out in t.transOUTs:
+                newUnSpentOutsTrans_elements.append(UnspentOutTrans(t.transOutId, t.transOutIndex, out.address, out.transOutIndex))
+        
+        newUnSpentOutsTrans : UnspentOutTrans = reduce(operator.concat, newUnSpentOutsTrans_elements, [])
+        
+     
+        consumed_elements = []
+        for t in aTransactions:
+            for transIN in reduce(operator.concat, t.transINs, []):
+                    consumed_elements.append(self.UnspentOutTrans(transIN.transOutId, transIN.transOutIndex, '', 0))
     
     
-    def updateUnspentOutTrans(aTransactions : Transaction, aUnspentOutTrans : UnspentOutTrans) -> UnspentOutTrans:
-        pass
+        consumedOutsTrans : UnspentOutTrans = consumed_elements
+  
+        
+        resultingUnspnetOutsTrans = None
+        # UnspentOutTrans as uto
+        resultingUnspnetOutsTrans_all= []
+        for uto in aUnspentOutsTrans:
+            if not self.findUnspentOutTrans(uto.trasOutId, uto.trasOutIndex, consumedOutsTrans):
+                resultingUnspnetOutsTrans_all.append(uto)
+        
+        return reduce(operator.concat, resultingUnspnetOutsTrans_all, newUnSpentOutsTrans)
+  
+
+     
+   # def newUnspentOutTrans():
+   #     return list(lambda transOut, index: self.UnspentOutTrans(t.transID, index, transOut.address, transOut.amount))
+    def processTransactions(self, aTransactions: Transaction, aUnspentOutTrans, UnspentOutTrans, blockIndex: float):
+        if not self.validateBlockTransaction(aTransactions, aUnspentOutTrans, blockIndex):
+            print('invalid block transaciton')
+            return None
+        return self.updateUnspentOutTrans(aTransactions, aUnspentOutTrans)
     
-         
+        
+    def toHexString(self, binStr):
+        return binascii.hexlify(binStr)
+
+    def hexString2binary(self, hexStr):
+        return binascii.unhexlify(hexStr)
+   
     
-    def newUnspentOutTrans():
-        pass
     
-    # To do: implement
-    def isValidTransactionStructure(self, transaction:Transaction):
+    def getPublicKey(self):
+        publ_key = RSA.importKey(self.__pub_key) 
+        return publ_key
+    
+    
+    def isValidInTransStructure(self, transIN: TransIN) -> bool :
+        if transIN == None:
+            print('transIN is None')
+            return False
+    
+        elif type(transIN.signature) != str:
+            print('invalid singature type in transIN')
+            return False
+        
+        elif type(transIN.transOutId) != str:
+            print('invalid transOutId type in transIN')
+            return False
+        
+        elif type(transIN.transOutIndex) != int:
+            print('invalid transOutIndex type in transIN')
+            return False
+        else:
+            return True
+    
+    
+    def isValidOutTransStructure(self, transOUT : TransOUT) -> bool:
+        if transOUT == None:
+            print('transOUT is None')
+            return False
+    
+        elif type(transOUT.address) != str:
+            print('invalid address type in transOUT')
+            return False
+        
+        elif not self.isValidAddress(transOUT.address):
+            print('not valid transOUT address')
+            return False
+        
+        elif type(transOUT.amount) != int:
+            print('invalid amount type in transOUT')
+            return False
        
-        if not type(transaction.id, str):
+        else:
+            return True
+        
+    # To do: implement
+    def isValidTransactionStructure(self, transaction:Transaction): 
+        if type(transaction.id) != str:
             print('transactionId missing')
             return False
         
-        if not isinstance(transaction.TransIN, list):
+        if not isinstance(transaction.TransINs, list):
             print('invalid TransIns type in transaction')
             return False
         
-        if not reduce(isValidTransOutStructure, transaction.transOUT):
+         # validation structures in transaction.transINs
+        if not reduce(lambda x,y: x and y, map(self.isValidInTransStructure,
+                                               transaction.transINs), True):
+            print('invalid some structure in transactionINs')
             return False
     
+        # validation type - expected list for input transaction.transOUTs
+        if not isinstance(transaction.transOUTs, list):
+            print('invalid transOUTs type in transaction')
+            return False
+ 
+        # validation structures in transaction.transOUTs
+        if not reduce(lambda x,y: x and y, map(self.isValidOutTransStructure,
+                                               transaction.transOUTs), True):
+            print('invalid some structure in transactionOUTs')
+            return False
+        
         return True
     
-   
-   
-
-
-        
-
+    #validation Address in publicKey
+    def isValidAddress(self, address : str) -> bool :
+        if len(address) != 130:
+            print(address, ' - invalid len of public key')
+            return False
+        elif re.match(r"^[a-fA-F0-9]+$", address) == None:
+            print('public key must contain only hex characters')
+            return False
+        elif address.startswith("04"):
+            print('public key must start with 04')
+            return False
+        else:
+            return True
     
-    
- 
     
     def verify(self, transaction: Transaction, signature):
         dataToVerify = (transaction.transID)
@@ -294,9 +393,4 @@ class TransMethods():
     
 
    
-    
-    def processTransactions(self, aTransactions, aUnspentTxOuts, blockIndex):
-        if not self.validateBlockTransactions(aTransactions, aUnspentTxOuts, blockIndex):
-            print('invalid block transactions')
-            return None
-        return self.updateUnspentTxOuts(aTransactions, aUnspentTxOuts) #TO_DO NOT IMPLEMENTED yet
+   
