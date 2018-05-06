@@ -18,7 +18,7 @@ class TransactionPool:
         """Adds transactions to the Pool, validates before hand."""
         if not validateTransaction(transaction, unspentTransOuts): #TO_DO import from transations
             raise ValueError("Invalid trans, can not add.")
-        if not isValidTransForPool(transaction, self.transactionPool):
+        if not self.isValidTransForPool(transaction, self.transactionPool):
             raise ValueError("Invalid trans, can not add.")
         print("Adding to the pool")
         print(transaction)
