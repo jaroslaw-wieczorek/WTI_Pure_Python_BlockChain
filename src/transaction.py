@@ -12,8 +12,8 @@ from src.generics.interfaces import GenericTransaction
 class Transaction(implements(GenericTransaction)):
     def __init__(self, transID, transIN, transOUT):
         self.transID = transID
-        self.transIN = transIN
-        self.transOUT = transOUT
+        self.transINs = transIN
+        self.transOUTs = transOUT
         
     def __repr__(self):
         return str(self.__dict__)
