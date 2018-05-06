@@ -16,7 +16,7 @@ class TransactionPool:
 
     def addToTransactionPool(self, transaction, unspentTransOuts):
         """Adds transactions to the Pool, validates before hand."""
-        if not validateTransaction(transaction, unspentTransOuts):
+        if not validateTransaction(transaction, unspentTransOuts): #TO_DO import from transations
             raise ValueError("Invalid trans, can not add.")
         if not isValidTransForPool(transaction, self.transactionPool):
             raise ValueError("Invalid trans, can not add.")
@@ -51,3 +51,16 @@ class TransactionPool:
             #252s vs 0.75s for 500000 array.
             #Which is a good thing because theoretically we could have very big lists here.
             #Source: https://stackoverflow.com/a/30353802
+
+    def containsTransIn(self, transIns,transIn):
+        """Returns the transaction if it exists in the list."""
+        return [x for x in transIns if x.transOutId == transIn.transOutId and x.transOutIndex == transIn.transOutIndex][0]
+
+    def isValidTransForPool(self, trans, xTransactionPool):
+        """Checks if the transaction is not a duplicate of an already existing transaction in the Pool."""
+        transPoolIns = self.getTransactionPoolIns(xTransactionPool)
+        for transIn in trans.transIN:
+            if self.containsTransIn(transPoolIns, transIn):
+                print("TransactionIn already exists in the Pool.")
+                return False
+        return True
