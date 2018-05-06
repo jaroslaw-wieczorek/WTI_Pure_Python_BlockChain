@@ -377,24 +377,7 @@ class TransMethods():
             return False
         else:
             return True
-            
-    """
     
-    const isValidAddress = (address: string): boolean => {
-    if (address.length !== 130) {
-        console.log(address);
-        console.log('invalid public key length');
-        return false;
-    } else if (address.match('^[a-fA-F0-9]+$') === null) {
-        console.log('public key must contain only hex characters');
-        return false;
-    } else if (!address.startsWith('04')) {
-        console.log('public key must start with 04');
-        return false;
-    }
-    return true;
-};
-    """
     
     def verify(self, transaction: Transaction, signature):
         dataToVerify = (transaction.transID)
