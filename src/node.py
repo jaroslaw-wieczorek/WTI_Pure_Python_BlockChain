@@ -155,14 +155,14 @@ class Node(implements(GenericNode),TransMethods):
     def addBlockToChain(self, newBlock):
         """Attempts to add a supplied block to the chain. Checks the necessary requirements, processes transactions, sets UnspentTXOuts and updates the Pool."""
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
-            retVal = TransMethods.processTransactions(newBlock.data, getUnspentTxOuts(), newBlock.index) #getUnspentTxOuts ALSO NOT IMPLEMENTED TO_DO
+            retVal = TransMethods.processTransactions(newBlock.data, getUnspentTransOuts(), newBlock.index) #getUnspentTransOuts ALSO NOT IMPLEMENTED TO_DO
             if retVal == None:
                 print('block is not valid in terms of transactions');
                 return False
             else:
                 self.blockchain.append(newBlock)
-                setUnspentTxOuts(retVal) #TO_DO setUnspentTxOuts ALSO NOT IMPLEMENTED
-                updateTransactionPool(unspentTxOuts) #TO_DO NOTHING IS IMPLEMENTED
+                setUnspentTransOuts(retVal) #TO_DO setUnspentTransOuts ALSO NOT IMPLEMENTED
+                updateTransactionPool(unspentTransOuts) #TO_DO NOTHING IS IMPLEMENTED
                 return True
 
         return False
@@ -203,37 +203,37 @@ class Node(implements(GenericNode),TransMethods):
 
     def generateNextBlock(self):
         """Creates a Coinbase transaction then adds the transactions awaiting in the Transaction Pool, lastly it uses generateRawNextBlock to create the actual block."""
-        coinbaseTx = getCoinbaseTransaction(getPublicFromWallet(), self.getLatestBlock().index + 1) #getCoinbaseTransaction should be imported from transactionMethods
-        blockData = [coinbaseTx] + getTransactionPool() #Transaction Pool is stil a long way
+        coinbaseTrans = getCoinbaseTransaction(getPublicFromWallet(), self.getLatestBlock().index + 1) #getCoinbaseTransaction should be imported from transactionMethods
+        blockData = [coinbaseTrans] + getTransactionPool() #Transaction Pool is stil a long way
         return self.generateRawNextBlock(blockData)
 
     def validateBlockChain(self, blockchaintovalidate: []) -> []:
-        """Checks the validity of a given blockchain, return unspent txOuts if it is valid."""
+        """Checks the validity of a given blockchain, return unspent transOuts if it is valid."""
         if not str(blockchaintovalidate[0]) == str(self.first_block):
             print("This is not even the correct blockchain are you even trying?")
             return None
         #Block is valid if the structure is valid and the transactions are valid.
-        aUnspentTxOuts = []
+        aUnspentTransOuts = []
         for previousBlock, currentBlock, nxtBlock in Utilities.previous_and_next(blockchaintovalidate):
             if not previousBlock == None and not self.isNewBlockValid(currentBlock, previousBlock):
                 return None
 
-            aUnspentTxOuts = processTransactions(currentBlock.data, aUnspentTxOuts, currentBlock.index) #TO_DO should be imported from transactionsMethods
-            if aUnspentTxOuts == None:
+            aUnspentTransOuts = processTransactions(currentBlock.data, aUnspentTransOuts, currentBlock.index) #TO_DO should be imported from transactionsMethods
+            if aUnspentTransOuts == None:
                 print("Invalid transactions")
                 return None
-        return aUnspentTxOuts
+        return aUnspentTransOuts
 
     def replaceChain(self, newBlocks):
         """If the Node receives a new blockchain this is used to verify and replace it if necessary."""
-        aUnspentTxOuts = self.isValidChain(newBlocks)
-        if aUnspentTxOuts is not None: validChain = True
+        aUnspentTransOuts = self.isValidChain(newBlocks)
+        if aUnspentTransOuts is not None: validChain = True
 
         if validChain and self.getSumDifficulty(newBlocks) > self.getSumDifficulty(self.getBlockchain()):
             print("Received a better blockchain, exchanging it for your old one for free!")
             self.blockchain = newBlocks
-            setUnspentTxOuts(aUnspentTxOuts)        #TO_DO
-            updateTransactionPool(unspentTxOuts)    #TO_DO
+            setUnspentTransOuts(aUnspentTransOuts)        #TO_DO
+            updateTransactionPool(unspentTransOuts)    #TO_DO
             broadcastLatest()                       #TO_DO
         else:
             print("Received a new blockchain but it doesn't look good. In to the trash it goes")
