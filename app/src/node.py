@@ -68,12 +68,15 @@ class Node(implements(GenericNode),TransMethods):
         """Gets the current timestamp in a proper POSIX format (double)."""
         return datetime.datetime.now().replace(tzinfo=timezone.utc).timestamp()
     def getLatestBlock(self):
+        """Gets the last block from the Blockchain."""
         return self.blockchain[-1]
 
     def getUnspentTransOuts(self):
+        """Returns a deepcopy of the unspent Transaction Outs."""
         return deepcopy(self.unspentTransOuts)
 
     def setUnspentTransOuts(self, newUnspentTransOuts):
+        """Replaces unspentTransOuts and prints that it happened."""
         print("Replacing UnspentTransOuts with new ones.")
         self.unspentTransOuts = newUnspentTransOuts
 
@@ -157,6 +160,7 @@ class Node(implements(GenericNode),TransMethods):
         if not self.isTimestampValid(newBlock, previousBlock):
             print("invalid timestamp")
         if not self.hasValidHash(newBlock):
+            print("invalid hash")
             return False
         return True
 
@@ -166,7 +170,7 @@ class Node(implements(GenericNode),TransMethods):
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
             retVal = TransMethods.processTransactions(newBlock.data, self.getUnspentTransOuts(), newBlock.index)
             if retVal == None:
-                print('block is not valid in terms of transactions');
+                print('block is not valid in terms of transactions')
                 return False
             else:
                 self.blockchain.append(newBlock)
