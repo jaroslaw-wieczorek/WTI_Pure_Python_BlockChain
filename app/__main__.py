@@ -36,8 +36,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 
-
-
 # Tests
 
 txIN = [TransIN("transOutIdIN_TransIN","transOutIndexIN_TransIN","signaureIN_TransIN"), TransIN("transOutIdIN_TransIN_2","transOutIndexIN_TransIN_2","signaureIN_TransIN_2")]
@@ -152,8 +150,9 @@ def main():
     
 
 if __name__ == "__main__":
-    unittest.main()
     main()
+    unittest.main()
+    
 
 
 
