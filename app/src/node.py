@@ -22,7 +22,7 @@ from .utilities import Utilities
 from .transaction import Transaction
 from .unspentOutTrans import UnspentOutTrans
 from .transactionMethods import TransMethods
-
+from .transactionPool import TransactionPool
 from .blockHeader import BlockHeader
 from .blockPayload import BlockPayload
 
@@ -162,7 +162,7 @@ class Node(implements(GenericNode),TransMethods):
             else:
                 self.blockchain.append(newBlock)
                 setUnspentTransOuts(retVal) #TO_DO setUnspentTransOuts ALSO NOT IMPLEMENTED
-                updateTransactionPool(unspentTransOuts) #TO_DO NOTHING IS IMPLEMENTED
+                TransactionPool.updateTransactionPool(unspentTransOuts) #TO_DO unspentTransOuts
                 return True
 
         return False
@@ -203,8 +203,8 @@ class Node(implements(GenericNode),TransMethods):
 
     def generateNextBlock(self):
         """Creates a Coinbase transaction then adds the transactions awaiting in the Transaction Pool, lastly it uses generateRawNextBlock to create the actual block."""
-        coinbaseTrans = getCoinbaseTransaction(getPublicFromWallet(), self.getLatestBlock().index + 1) #getCoinbaseTransaction should be imported from transactionMethods
-        blockData = [coinbaseTrans] + getTransactionPool() #Transaction Pool is stil a long way
+        coinbaseTrans = TransactionPool.getCoinbaseTransaction(getPublicFromWallet(), self.getLatestBlock().index + 1) #TO_DO get public key
+        blockData = [coinbaseTrans] + TransactionPool.getTransactionPool()
         return self.generateRawNextBlock(blockData)
 
     def validateBlockChain(self, blockchaintovalidate: []) -> []:
@@ -218,7 +218,7 @@ class Node(implements(GenericNode),TransMethods):
             if not previousBlock == None and not self.isNewBlockValid(currentBlock, previousBlock):
                 return None
 
-            aUnspentTransOuts = processTransactions(currentBlock.data, aUnspentTransOuts, currentBlock.index) #TO_DO should be imported from transactionsMethods
+            aUnspentTransOuts = TransMethods.processTransactions(currentBlock.data, aUnspentTransOuts, currentBlock.index) #TO_DO should be imported from transactionsMethods
             if aUnspentTransOuts == None:
                 print("Invalid transactions")
                 return None
@@ -233,7 +233,7 @@ class Node(implements(GenericNode),TransMethods):
             print("Received a better blockchain, exchanging it for your old one for free!")
             self.blockchain = newBlocks
             setUnspentTransOuts(aUnspentTransOuts)        #TO_DO
-            updateTransactionPool(unspentTransOuts)    #TO_DO
+            TransactionPool.updateTransactionPool(unspentTransOuts)    #TO_DO
             broadcastLatest()                       #TO_DO
         else:
             print("Received a new blockchain but it doesn't look good. In to the trash it goes")
