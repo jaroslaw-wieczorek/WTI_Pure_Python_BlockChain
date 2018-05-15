@@ -11,6 +11,7 @@ from datetime import timezone
 import hashlib
 from functools import reduce
 from interface import implements
+from copy import deepcopy
 
 
 from .generics.interfaces import GenericNode
@@ -57,6 +58,7 @@ class Node(implements(GenericNode),TransMethods):
 
     def __init__(self):
         self.blockchain = [self.first_block]
+        self.unspentTransOuts = TransMethods.processTransactions(self.blockchain[0].blockPayload.data, [], 0)
 
     def getBlockchain(self):
         """Returns the whole blockchain."""
@@ -68,7 +70,14 @@ class Node(implements(GenericNode),TransMethods):
     def getLatestBlock(self):
         return self.blockchain[-1]
 
-    def calculateHash(self, BlockHeader, BlockPayload): #TO_DO FIX THIS
+    def getUnspentTransOuts(self):
+        return deepcopy(self.unspentTransOuts)
+
+    def setUnspentTransOuts(self, newUnspentTransOuts):
+        print("Replacing UnspentTransOuts with new ones.")
+        self.unspentTransOuts = newUnspentTransOuts
+
+    def calculateHash(self, BlockHeader, BlockPayload): #TO_DO VERIFY the consistency of hash generation
         """Calculates the hash for the supplied BlockHeader and BlockPayload."""
         h=hashlib.sha256((str(BlockHeader)+''+str(BlockPayload)).encode("utf-8"))
         return h.hexdigest()
@@ -155,14 +164,14 @@ class Node(implements(GenericNode),TransMethods):
     def addBlockToChain(self, newBlock):
         """Attempts to add a supplied block to the chain. Checks the necessary requirements, processes transactions, sets UnspentTXOuts and updates the Pool."""
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
-            retVal = TransMethods.processTransactions(newBlock.data, getUnspentTransOuts(), newBlock.index) #getUnspentTransOuts ALSO NOT IMPLEMENTED TO_DO
+            retVal = TransMethods.processTransactions(newBlock.data, self.getUnspentTransOuts(), newBlock.index)
             if retVal == None:
                 print('block is not valid in terms of transactions');
                 return False
             else:
                 self.blockchain.append(newBlock)
-                setUnspentTransOuts(retVal) #TO_DO setUnspentTransOuts ALSO NOT IMPLEMENTED
-                TransactionPool.updateTransactionPool(unspentTransOuts) #TO_DO unspentTransOuts
+                self.setUnspentTransOuts(retVal)
+                TransactionPool.updateTransactionPool(self.unspentTransOuts)
                 return True
 
         return False
@@ -220,7 +229,7 @@ class Node(implements(GenericNode),TransMethods):
             if not previousBlock == None and not self.isNewBlockValid(currentBlock, previousBlock):
                 return None
 
-            aUnspentTransOuts = TransMethods.processTransactions(currentBlock.data, aUnspentTransOuts, currentBlock.index) #TO_DO should be imported from transactionsMethods
+            aUnspentTransOuts = TransMethods.processTransactions(currentBlock.data, aUnspentTransOuts, currentBlock.index)
             if aUnspentTransOuts == None:
                 print("Invalid transactions")
                 return None
@@ -234,8 +243,8 @@ class Node(implements(GenericNode),TransMethods):
         if validChain and self.getSumDifficulty(newBlocks) > self.getSumDifficulty(self.getBlockchain()):
             print("Received a better blockchain, exchanging it for your old one for free!")
             self.blockchain = newBlocks
-            setUnspentTransOuts(aUnspentTransOuts)        #TO_DO
-            TransactionPool.updateTransactionPool(unspentTransOuts)    #TO_DO
+            self.setUnspentTransOuts(aUnspentTransOuts)
+            TransactionPool.updateTransactionPool(self.unspentTransOuts)
             broadcastLatest()                       #TO_DO
         else:
             print("Received a new blockchain but it doesn't look good. In to the trash it goes")
