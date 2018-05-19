@@ -163,7 +163,7 @@ class TransMethods():
         if self.getTransactionId(transaction) != transaction.transID :
             print('invalid coinbase tx id: ' + transaction.transID)
             return False
-        if transaction.transINs.length != 1:
+        if len(transaction.transINs) != 1:
             print('one transIn must be specified in the coinbase transaction')
             return False
 
