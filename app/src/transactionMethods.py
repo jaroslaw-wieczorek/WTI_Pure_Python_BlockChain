@@ -311,10 +311,10 @@ class TransMethods():
         
     def toHexString(self, binStr):
         return binascii.hexlify(binStr)
+    
 
     def hexString2binary(self, hexStr):
         return binascii.unhexlify(hexStr)
-   
     
     
     def getPublicKey(self):
