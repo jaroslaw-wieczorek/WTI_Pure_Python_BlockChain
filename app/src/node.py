@@ -58,7 +58,7 @@ class Node(implements(GenericNode),TransMethods):
 
     def __init__(self):
         self.blockchain = [self.first_block]
-        self.unspentTransOuts = TransMethods.processTransactions(self.blockchain[0].blockPayload.data, [], 0)
+        self.unspentTransOuts = self.processTransactions(self.blockchain[0].blockPayload.data, [], 0)
 
     def getBlockchain(self):
         """Returns the whole blockchain."""
@@ -98,7 +98,7 @@ class Node(implements(GenericNode),TransMethods):
     def generateNextBlockPayload(self, transactions): #TO_DO TRANSACTIONS AND PAYLOAD NOT YET IMPLEMENTED
         pass
 
-    def findNextBlock(self,block):
+    def findNextBlock(self, block):
         """Proof of work, finds the hash that matches the given difficulty for a block."""
         while True:
             nonce = 0
@@ -168,7 +168,7 @@ class Node(implements(GenericNode),TransMethods):
     def addBlockToChain(self, newBlock):
         """Attempts to add a supplied block to the chain. Checks the necessary requirements, processes transactions, sets UnspentTXOuts and updates the Pool."""
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
-            retVal = TransMethods.processTransactions(newBlock.data, self.getUnspentTransOuts(), newBlock.index)
+            retVal = self.processTransactions(newBlock.data, self.getUnspentTransOuts(), newBlock.index)
             if retVal == None:
                 print('block is not valid in terms of transactions')
                 return False
@@ -217,7 +217,7 @@ class Node(implements(GenericNode),TransMethods):
     def generateNextBlock(self):
         """Creates a Coinbase transaction then adds the transactions awaiting in the Transaction Pool, lastly it uses generateRawNextBlock to create the actual block."""
         #coinbaseTrans = TransactionPool.getCoinbaseTransaction(getPublicFromWallet(), self.getLatestBlock().index + 1) #TO_DO get public key
-        coinbaseTrans = TransactionPool.getCoinbaseTransaction(TransMethods.getPublicKey(),
+        coinbaseTrans = TransactionPool.getCoinbaseTransaction(self.getPublicKey(),
                                                                self.getLatestBlock().index + 1)  # TO_DO get public key PROPERLY
         blockData = [coinbaseTrans] + TransactionPool.getTransactionPool()
         return self.generateRawNextBlock(blockData)
@@ -233,7 +233,7 @@ class Node(implements(GenericNode),TransMethods):
             if not previousBlock == None and not self.isNewBlockValid(currentBlock, previousBlock):
                 return None
 
-            aUnspentTransOuts = TransMethods.processTransactions(currentBlock.data, aUnspentTransOuts, currentBlock.index)
+            aUnspentTransOuts = self.processTransactions(currentBlock.data, aUnspentTransOuts, currentBlock.index)
             if aUnspentTransOuts == None:
                 print("Invalid transactions")
                 return None
