@@ -159,20 +159,18 @@ class Node(implements(GenericNode),TransMethods):
             return False
         return True
 
-    #Missing functions, do not use
     def addBlockToChain(self, newBlock):
         """Attempts to add a supplied block to the chain. Checks the necessary requirements, processes transactions, sets UnspentTXOuts and updates the Pool."""
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
-            retVal = self.processTransactions(newBlock.data, self.getUnspentTransOuts(), newBlock.index)
-            if retVal == None:
-                print('block is not valid in terms of transactions')
+            unspentOuts = self.processTransactions(newBlock.data, self.getUnspentTransOuts(), newBlock.index)
+            if  unspentOuts == None:
+                print("Block transactions are not valid.")
                 return False
             else:
                 self.blockchain.append(newBlock)
-                self.setUnspentTransOuts(retVal)
+                self.setUnspentTransOuts(unspentOuts)
                 TransactionPool.updateTransactionPool(self.unspentTransOuts)
                 return True
-
         return False
 
     def generateRawNextBlock(self,transactions):
