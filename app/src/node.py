@@ -211,7 +211,7 @@ class Node(implements(GenericNode),TransMethods):
 
     def generateNextBlock(self):
         """Creates a Coinbase transaction then adds the transactions awaiting in the Transaction Pool, lastly it uses generateRawNextBlock to create the actual block."""
-        coinbaseTrans = TransactionPool.getCoinbaseTransaction(Wallet.getPublicFromWallet(), self.getLatestBlock().index + 1) #TO_DO get public key
+        coinbaseTrans = TransactionPool.getCoinbaseTransaction(Wallet.getPublicFromWallet(), self.getLatestBlock().index + 1)
         blockData = [coinbaseTrans] + TransactionPool.getTransactionPool()
         return self.generateRawNextBlock(blockData)
 
