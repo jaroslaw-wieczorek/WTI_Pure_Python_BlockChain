@@ -91,8 +91,9 @@ class Node(implements(GenericNode),TransMethods):
         newBlockHeader = BlockHeader(nextIndex, previousBlock.hash, nextTimestamp, difficulty, nonce)
         return newBlockHeader
 
-    def generateNextBlockPayload(self, transactions): #TO_DO TRANSACTIONS AND PAYLOAD NOT YET IMPLEMENTED
-        pass
+    def generateNextBlockPayload(self, transactions):
+        """Creates a BlockPayload filled with supplied transactions."""
+        return BlockPayload(transactions)
 
     def generateNextBlockWithTransaction(self, receiverAddress, ammountToSend):
         """Creates a new block for the purpose of including a new transaction.
