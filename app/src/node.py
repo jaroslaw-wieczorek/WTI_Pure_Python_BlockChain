@@ -37,12 +37,6 @@ from base64 import b64encode, b64decode
 class Node(implements(GenericNode),TransMethods):
     '''
     '''
-    #Constant variables:
-    #Firsttransaction
-    first_transaction = Transaction("FIRST_TRANS_ID", [TransIN("", "", "")], [TransOUT("MY_ADDRESS", 50)]) #TO_DO still not final
-    #Firstblock
-    first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload([first_transaction]))
-
     #Difficulty:
     #in seconds
     BLOCK_GENERATION_INTERVAL = 10
@@ -52,6 +46,12 @@ class Node(implements(GenericNode),TransMethods):
     COINBASE_AMOUNT = 50
 
     def __init__(self):
+        self.first_transaction = self.getCoinbaseTransaction("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCzQAJ6HqLqWEDv2J5q1Jbn8+6clj5v24fI+U6WwtBqkmeJz6+Hz8NzWLrxd/uXJpxw+zj2D0zsXAhC7MRnwP+O+Q+oMfHCtC1pG+9DR9s2Ce3JU6/GP9H/jGhB3X8QwCoR6oUBoQXe/anLDaYB/6hxshKx6G7YmWFm3FGFvgzdMwIDAQAB",
+                                                             0)
+        self.first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0),
+                                 BlockPayload([self.first_transaction]))
+        self.first_block.currentHash = self.calculateHash(self.first_block.blockHeader, self.first_block.blockPayload)
+        print(self.first_block.currentHash)
         self.blockchain = [self.first_block]
         self.unspentTransOuts = self.processTransactions(self.blockchain[0].blockPayload.data, [], 0)
 
@@ -76,7 +76,7 @@ class Node(implements(GenericNode),TransMethods):
         print("Replacing UnspentTransOuts with new ones.")
         self.unspentTransOuts = newUnspentTransOuts
 
-    def calculateHash(self, BlockHeader, BlockPayload): #TO_DO VERIFY the consistency of hash generation
+    def calculateHash(self, BlockHeader, BlockPayload): #TODO VERIFY the consistency of hash generation
         """Calculates the hash for the supplied BlockHeader and BlockPayload."""
         h=hashlib.sha256((str(BlockHeader)+''+str(BlockPayload)).encode("utf-8"))
         return h.hexdigest()
@@ -193,7 +193,7 @@ class Node(implements(GenericNode),TransMethods):
         """Creates the block, fills it with supplied transactions and attempts to add it to the chain and broadcast the success."""
         newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))
         if self.addBlockToChain(newBlock):
-            self.broadcastLatest() #TO_DO not implemented
+            self.broadcastLatest() #TODO not implemented
             return newBlock
         else:
             return None
@@ -255,9 +255,9 @@ class Node(implements(GenericNode),TransMethods):
             self.blockchain = newBlocks
             self.setUnspentTransOuts(aUnspentTransOuts)
             TransactionPool.updateTransactionPool(self.unspentTransOuts)
-            broadcastLatest()                       #TO_DO
+            broadcastLatest()                       #TODO
         else:
             print("Received a new blockchain but it doesn't look good. In to the trash it goes")
 
     def getOwnersUnspentTransactionOutputs(self):
-        return Wallet.findUnspentTransOuts(Wallet.getPublicFromWallet(), self.getUnspentTransOuts()) #TO_DO import findUnspentTransOuts from wallet
+        return Wallet.findUnspentTransOuts(Wallet.getPublicFromWallet(), self.getUnspentTransOuts()) #TODO import findUnspentTransOuts from wallet
