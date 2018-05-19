@@ -26,7 +26,7 @@ from .transactionMethods import TransMethods
 from .transactionPool import TransactionPool
 from .blockHeader import BlockHeader
 from .blockPayload import BlockPayload
-
+from .wallet import Wallet
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
 from Crypto.Hash import SHA256
@@ -42,11 +42,6 @@ class Node(implements(GenericNode),TransMethods):
     first_transaction = Transaction("FIRST_TRANS_ID", [TransIN("", "", "")], [TransOUT("MY_ADDRESS", 50)]) #TO_DO still not final
     #Firstblock
     first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload([first_transaction]))
-
-    # private key
-    __key = open("app/rsa_keys/key", "r").read()
-
-    __pub_key = open("app/rsa_keys/key.pub", "r").read()
 
     #Difficulty:
     #in seconds
@@ -216,9 +211,7 @@ class Node(implements(GenericNode),TransMethods):
 
     def generateNextBlock(self):
         """Creates a Coinbase transaction then adds the transactions awaiting in the Transaction Pool, lastly it uses generateRawNextBlock to create the actual block."""
-        #coinbaseTrans = TransactionPool.getCoinbaseTransaction(getPublicFromWallet(), self.getLatestBlock().index + 1) #TO_DO get public key
-        coinbaseTrans = TransactionPool.getCoinbaseTransaction(self.getPublicKey(),
-                                                               self.getLatestBlock().index + 1)  # TO_DO get public key PROPERLY
+        coinbaseTrans = TransactionPool.getCoinbaseTransaction(Wallet.getPublicFromWallet(), self.getLatestBlock().index + 1) #TO_DO get public key
         blockData = [coinbaseTrans] + TransactionPool.getTransactionPool()
         return self.generateRawNextBlock(blockData)
 
@@ -254,4 +247,4 @@ class Node(implements(GenericNode),TransMethods):
             print("Received a new blockchain but it doesn't look good. In to the trash it goes")
 
     def getOwnersUnspentTransactionOutputs(self):
-        return self.findUnspentTransOuts(self.getPublicKey(), self.getUnspentTransOuts()) #TO_DO import findUnspentTransOuts from wallet
+        return self.findUnspentTransOuts(Wallet.getPublicFromWallet(), self.getUnspentTransOuts()) #TO_DO import findUnspentTransOuts from wallet
