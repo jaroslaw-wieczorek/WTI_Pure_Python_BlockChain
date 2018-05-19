@@ -96,7 +96,7 @@ class TransMethods():
                                                          default=True)))                               
             
         if not hasValidInTrans:
-             print('[*] some of the transINs are invalid in trans: ' + transaction.transID);
+             print('[*] some of the transINs are invalid in trans: ' + transaction.transID)
              return False
         
        
@@ -110,7 +110,7 @@ class TransMethods():
         # check 
         if totalOutTransValues != totalInTransValues:
             print('totalOutTransValues != totalInTransValues in tx: ' + transaction.transID)
-        return False;
+        return False
 
 
 
@@ -190,7 +190,7 @@ class TransMethods():
             return False
         
         # TO check ! 
-        address = referencedUnTransOut.address;
+        address = referencedUnTransOut.address
         
         publ_key = RSA.importKey(address) 
         
@@ -208,7 +208,7 @@ class TransMethods():
     
         
     def getTransInAmount(self, transIN : TransIN, aUnspentOutTrans : UnspentOutTrans) -> float:
-        return self.findUnspentOutTrans(transIN.transOutId, transIN.transOutIndex, aUnspentOutTrans).amount;
+        return self.findUnspentOutTrans(transIN.transOutId, transIN.transOutIndex, aUnspentOutTrans).amount
     
     
     
@@ -223,7 +223,7 @@ class TransMethods():
                 return uTransOut
     
     
-    def getCoinbaseTransaction(self, address: str, blockIndex : float) -> Transaction: 
+    def getCoinbaseTransaction(self, address: str, blockIndex : int) -> Transaction:
         t = Transaction()
         newtransIN = TransIN()
         newtransIN.signature = ''
@@ -231,10 +231,10 @@ class TransMethods():
         newtransIN.transOutIndex = blockIndex
         
         t.transINs = [newtransIN]
-        t.transOUTs = [TransOUT(address, self.COINBASE_AMOUNT)];
-        t.transID = self.getTransactionId(t);
+        t.transOUTs = [TransOUT(address, self.COINBASE_AMOUNT)]
+        t.transID = self.getTransactionId(t)
         
-        return t;
+        return t
     
    
     def signTransIN(self, transaction: Transaction, transInIndex: int, aUnspentOutTrans: UnspentOutTrans):
@@ -248,7 +248,7 @@ class TransMethods():
             print("could not find referenced transOUT")
             raise Exception
         
-        referencedAddress = referencedUnspentOutTrans.address;
+        referencedAddress = referencedUnspentOutTrans.address
         
         if  self.getPublicKey(self.__privateKey) != referencedAddress:
             print('trying to sign an input with private' + ' key that does not match the address that is referenced in transIN')
