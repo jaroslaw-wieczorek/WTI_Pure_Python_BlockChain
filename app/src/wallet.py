@@ -22,7 +22,7 @@ from base64 import b64encode, b64decode
 from Crypto import Random
 
 # importing data accc
-lib_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys'))
+lib_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key.pem'))
 sys.path.append(lib_path)
 
 
@@ -31,7 +31,7 @@ class Wallet(implements(UI)):
     
     def __init__(self, address):
         # PRIVATE KEY
-        self.__privateFileKey = open(lib_path+'/key.pem', "r").read()
+        self.__privateFileKey = open(lib_path, "r").read()
        
         # PUBLIC KEY
         self.__publicKey = None
@@ -57,17 +57,24 @@ class Wallet(implements(UI)):
         new_key = RSA.generate(1024, rng) 
         self.__privKey = new_key.exportKey("PEM") 
         
-        with open(lib_path+'/key.pem', 'wb') as pem:
+        with open(lib_path, 'wb') as pem:
             pem.write(self.__privKey)
             pem.close()
         
-        return str(self.__priv_key)
+        return str(lib_path)
     
 
-    def method(self):
-        print("to działa")
+    def initWallet(self):
+        if os.path.isfile(lib_path):
+            return
+        else:
+            newPrivateKey = self.generatePrivateKey()
+            print("new wallet with private key created to : " % newPrivateKey)
+   
     
-    def method_b(self):
-        print("to działa")
+    def deleteWallet(self):
+        if os.path.isfile(lib_path):
+            os.remove(lib_path)
+            
 
 
