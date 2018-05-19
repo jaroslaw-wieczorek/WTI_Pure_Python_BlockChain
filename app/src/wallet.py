@@ -29,7 +29,7 @@ class Wallet(implements(UI)):
     
     def __init__(self, address):
         
-        privateKeyLocation = 
+      #  privateKeyLocation = 
         super()
         
         
