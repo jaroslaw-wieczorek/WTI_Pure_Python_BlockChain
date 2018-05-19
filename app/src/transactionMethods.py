@@ -20,22 +20,33 @@ from base64 import b64encode, b64decode
 
 class TransMethods():
     
-
-    
     def __init__(self):
         self.__key = open("rsa_keys/key", "r").read()
         self.__pub_key = open("rsa_keys/key.pub", "r").read()
     
     def concIN(self, x):
+        """
+            Concatenate fileds of InTrans for Transaction ID  
+        """
         return str(x.transOutId) + '' +str(x.transOutIndex)
     
     
+    
     def concOUT(self, x):
+        
+        """
+            Concatenate fileds of OutTrans for Transaction ID 
+        """
         return str(x.address) + '' +str(x.amount)
+    
     
     
     def getTransactionId(self, transaction: Transaction) -> str:
         
+        """
+          Methods return string contains Transaction ID
+          
+        """
         # Concatenate data from transIN objects list: 
         # transOutId & transOutIndexand reduce to one string
         transINContent : str = reduce(lambda x,y:  x+y, 
@@ -54,9 +65,19 @@ class TransMethods():
     
     
     
+    
     def validateTransaction(self, transaction:Transaction, 
                             aUnspentOutTrans:UnspentOutTrans) -> bool:
        
+        """
+           Validate properly of the whole Transaction: 
+           Verifies properly the transaction structure.
+           Verifies properly the transaction id.
+           Verifies properly the input transactions.
+           Verifies properly the  output transactions.
+           Verifies properly the equal sums of InTrans and OutTrans
+            
+        """
         if not self.isValidTransactionStructure(transaction):
             return False
         
@@ -95,6 +116,11 @@ class TransMethods():
 
     def validateBlockTransactions(self, aTransactions, aUnspentOutTrans : UnspentOutTrans, blockIndex : float):
         coinbaseTrans = aTransactions[0]
+        
+        """
+           Validate block of TransactionsOutTrans
+            
+        """
         
         if not self.validateCoinbaseTrans(self,coinbaseTrans, blockIndex):
             print('invalid coinbase transaction: ' + coinbaseTrans)
@@ -269,13 +295,14 @@ class TransMethods():
             if not self.findUnspentOutTrans(uto.trasOutId, uto.trasOutIndex, consumedOutsTrans):
                 resultingUnspnetOutsTrans_all.append(uto)
         
-        return reduce(operator.concat, resultingUnspnetOutsTrans_all, newUnSpentOutsTrans)
+        resultingUnspnetOutsTrans = reduce(operator.concat, resultingUnspnetOutsTrans_all, newUnSpentOutsTrans)
+        return resultingUnspnetOutsTrans
   
 
      
    # def newUnspentOutTrans():
    #     return list(lambda transOut, index: self.UnspentOutTrans(t.transID, index, transOut.address, transOut.amount))
-    def processTransactions(self, aTransactions: Transaction, aUnspentOutTrans, UnspentOutTrans, blockIndex: float):
+    def processTransactions(self, aTransactions: Transaction, aUnspentOutTrans, UnspentOutTrans, blockIndex):
         if not self.validateBlockTransaction(aTransactions, aUnspentOutTrans, blockIndex):
             print('invalid block transaciton')
             return None
