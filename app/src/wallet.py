@@ -29,11 +29,10 @@ class Wallet(implements(UI)):
     
     def __init__(self, address):
         
-          
         # private key
-        __key = open("rsa_keys/key", "r").read()
-
-        __pub_key = open("rsa_keys/key.pub", "r").read()
+        self.__key = open("key", "r").read()
+        self.__pub_key = open("key.pub", "r").read()
+        
         super()
         
         
