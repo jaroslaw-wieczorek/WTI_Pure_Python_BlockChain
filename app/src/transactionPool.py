@@ -1,5 +1,5 @@
 from copy import deepcopy
-
+from .transactionMethods import TransMethods
 
 class TransactionPool:
     transactionPool = []
@@ -16,7 +16,7 @@ class TransactionPool:
 
     def addToTransactionPool(self, transaction, unspentTransOuts):
         """Adds transactions to the Pool, validates before hand."""
-        if not validateTransaction(transaction, unspentTransOuts): #TO_DO import from transations
+        if not TransMethods.validateTransaction(transaction, unspentTransOuts):
             raise ValueError("Invalid trans, can not add.")
         if not self.isValidTransForPool(transaction, self.transactionPool):
             raise ValueError("Invalid trans, can not add.")

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from interface import implements
-from src.generics.interfaces import GenericUnspentOutTrans
+from .generics.interfaces import GenericUnspentOutTrans
 
 
 
