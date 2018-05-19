@@ -135,7 +135,8 @@ class TransMethods():
             return False
         
         #Check  dupliactes 2
-        if len(transIns) != len(set(transIns)):
+        
+        if len({tuple(*transIns)}) != len(set({tuple(*transIns)})):
             print("Some duplicate transIN")
             return False
         
@@ -147,10 +148,15 @@ class TransMethods():
     
     # NEED CHANGE TO CHEK ON KEYS
     def hasDuplicates(self, transIns : TransIN) -> bool:
-        seen = set()
-        for x in transIns:
-            if x in seen: return True
-            seen.add(x)
+        transIns2 = {tuple(*transIns)}
+        seen = set(transIns2)
+        seen2 = set()
+        
+        for x in {tuple(*transIns)}:
+            if x not in seen2: 
+                seen2.add(x)
+            else:
+                return True
         return False
     
     
@@ -266,7 +272,7 @@ class TransMethods():
 
         # t - Transaction
         newUnSpentOutsTrans_elements = []
-        for t in aTransactions:
+        for t in aUnspentOutsTrans:
             for out in t.transOUTs:
                 newUnSpentOutsTrans_elements.append(UnspentOutTrans(t.transOutId, t.transOutIndex, out.address, out.transOutIndex))
         
