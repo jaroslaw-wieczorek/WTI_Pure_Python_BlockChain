@@ -39,8 +39,8 @@ class Wallet(implements(UI)):
         super()
         
     def getPrivateFromWallet(self) -> str: 
-        self.__privKey = RSA.importKey(self.__privateFileKey) 
-        return self.__privKey
+        self.__privateKey = RSA.importKey(self.__privateFileKey) 
+        return self.__privateKey 
     
     def getPublicFromWallet(self) -> str: 
         self.__publKey = self.getPrivateFromWallet().publickey().exportKey()
@@ -55,10 +55,10 @@ class Wallet(implements(UI)):
         '''
         rng = Random.new().read
         new_key = RSA.generate(1024, rng) 
-        self.__privKey = new_key.exportKey("PEM") 
+        self.__privateKey = new_key.exportKey("PEM") 
         
         with open(lib_path, 'wb') as pem:
-            pem.write(self.__privKey)
+            pem.write(self.__privateKey)
             pem.close()
         
         return str(lib_path)
