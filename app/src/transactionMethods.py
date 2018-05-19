@@ -223,7 +223,7 @@ class TransMethods():
                 return uTransOut
     
     
-    def getCoinbaseTransaction(self, address: str, blockIndex : float) -> Transaction: 
+    def getCoinbaseTransaction(self, address: str, blockIndex : int) -> Transaction:
         t = Transaction()
         newtransIN = TransIN()
         newtransIN.signature = ''
