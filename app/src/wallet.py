@@ -20,15 +20,16 @@ from Cryptodome.Hash import SHA256
 from base64 import b64encode, b64decode 
 
 from Cryptodome import Random
-from operator import add
-
+from .unspentOutTrans import UnspentOutTrans
+from .transactionMethods import TransMethods
 # importing data accc
 lib_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key.pem'))
+current_file_path = os.path.abspath(os.path.join(__file__))
 sys.path.append(lib_path)
+sys.path.append(current_file_path)
 
 
-
-class Wallet(implements(UI)):
+class Wallet(implements(UI), TransMethods):
     
     def __init__(self, address):
         # PRIVATE KEY
@@ -80,15 +81,14 @@ class Wallet(implements(UI)):
             os.remove(lib_path)
             
     
-    """def getBalance(address:str, unspentOutTrans : UnspentOutTrans):
-        return map(operator.add,    )
-
-    """
-
-
-
-
-
+    def getBalance(self, address : str, unspentOutTrans : UnspentOutTrans):
+        balance=0
+        found_unspent_transactions = map(self.findUnspentOutTrans(address, unspentOutTrans), unspentOutTrans)
+        for trans in found_unspent_transactions:
+            balance += trans.amount
+     
+        return balance
+    
 
 
 
