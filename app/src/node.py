@@ -44,9 +44,9 @@ class Node(implements(GenericNode),TransMethods):
     first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
 
     # private key
-    __key = open("rsa_keys/key", "r").read()
+    __key = open("app/rsa_keys/key", "r").read()
 
-    __pub_key = open("rsa_keys/key.pub", "r").read()
+    __pub_key = open("app/rsa_keys/key.pub", "r").read()
 
     #Difficulty:
     #in seconds
