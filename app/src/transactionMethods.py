@@ -281,7 +281,8 @@ class TransMethods():
      
         consumed_elements = []
         for t in aTransactions:
-            for transIN in reduce(operator.concat, t.transINs, []):
+            concate = map(operator.concat, t.transINs, [])
+            for transIN in concate:
                     consumed_elements.append(self.UnspentOutTrans(transIN.transOutId, transIN.transOutIndex, '', 0))
     
     
