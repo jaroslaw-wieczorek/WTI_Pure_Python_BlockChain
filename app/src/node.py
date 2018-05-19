@@ -39,9 +39,9 @@ class Node(implements(GenericNode),TransMethods):
     '''
     #Constant variables:
     #Firsttransaction
-    first_transaction = Transaction("FIRST_TRANS_ID", TransIN("", "", ""), TransOUT("MY_ADDRESS", 50)) #TO_DO still not final
+    first_transaction = Transaction("FIRST_TRANS_ID", [TransIN("", "", "")], [TransOUT("MY_ADDRESS", 50)]) #TO_DO still not final
     #Firstblock
-    first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload(first_transaction))
+    first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0), BlockPayload([first_transaction]))
 
     # private key
     __key = open("app/rsa_keys/key", "r").read()
