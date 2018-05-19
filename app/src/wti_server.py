@@ -18,9 +18,9 @@ class Server:
 
 	async def handler(self, websocket, path):
 		async for message in websocket:
-			print('server received :', message)
+			print('[*] Serwer odebrał:', message)
 			await websocket.send(message)
-			print('get')
+			print('\n[*]Odczytałem odsyłam wiadomość')
 
 
 if __name__ == '__main__':
