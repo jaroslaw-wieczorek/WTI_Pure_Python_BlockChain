@@ -14,12 +14,13 @@ import operator
 from datetime import timezone
 from functools import reduce
 
-from Crypto.PublicKey import RSA 
-from Crypto.Signature import PKCS1_v1_5 
-from Crypto.Hash import SHA256 
+from Cryptodome.PublicKey import RSA 
+from Cryptodome.Signature import PKCS1_v1_5 
+from Cryptodome.Hash import SHA256 
 from base64 import b64encode, b64decode 
 
-from Crypto import Random
+from Cryptodome import Random
+from operator import add
 
 # importing data accc
 lib_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key.pem'))
@@ -33,18 +34,20 @@ class Wallet(implements(UI)):
         # PRIVATE KEY
         self.__privateFileKey = open(lib_path, "r").read()
        
-        # PUBLIC KEY
-        self.__publicKey = None
+        self.__privateKey = RSA.importKey(self.__privateFileKey) 
+        self.__publicKey = self.getPrivateFromWallet().publickey().exportKey()
+               
+        
         #self.__pub_key = open("key.pub", "r").read()
         super()
         
     def getPrivateFromWallet(self) -> str: 
-        self.__privateKey = RSA.importKey(self.__privateFileKey) 
+        #self.__privateKey = RSA.importKey(self.__privateFileKey) 
         return self.__privateKey 
     
     def getPublicFromWallet(self) -> str: 
-        self.__publKey = self.getPrivateFromWallet().publickey().exportKey()
-        return self.__publKey
+        #self.__publKey = self.getPrivateFromWallet().publickey().exportKey()
+        return self.__publicKey
     
     
     def generatePrivateKey(self) -> str:
@@ -76,5 +79,16 @@ class Wallet(implements(UI)):
         if os.path.isfile(lib_path):
             os.remove(lib_path)
             
+    
+    """def getBalance(address:str, unspentOutTrans : UnspentOutTrans):
+        return map(operator.add,    )
+
+    """
+
+
+
+
+
+
 
 
