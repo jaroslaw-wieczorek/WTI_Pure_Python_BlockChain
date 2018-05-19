@@ -131,7 +131,7 @@ class TransMethods():
         transIns = list(map(lambda x: x.transINs, aTransactions))
         
         #Check dupliactes 1
-        if self.hasDupliactes(transIns):
+        if self.hasDuplicates(transIns):
             return False
         
         #Check  dupliactes 2
