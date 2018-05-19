@@ -62,6 +62,7 @@ class Node(implements(GenericNode),TransMethods):
     def getCurrentTimestamp(self):
         """Gets the current timestamp in a proper POSIX format (double)."""
         return datetime.datetime.now().replace(tzinfo=timezone.utc).timestamp()
+
     def getLatestBlock(self):
         """Gets the last block from the Blockchain."""
         return self.blockchain[-1]
@@ -92,6 +93,21 @@ class Node(implements(GenericNode),TransMethods):
 
     def generateNextBlockPayload(self, transactions): #TO_DO TRANSACTIONS AND PAYLOAD NOT YET IMPLEMENTED
         pass
+
+    def generateNextBlockWithTransaction(self, receiverAddress, ammountToSend):
+        """Creates a new block for the purpose of including a new transaction.
+        This method generates the coinbase transaction and the outgoing transaction
+         and calls generateRawNextBlock to add the transactions to the blockchain."""
+        if not self.isValidAddress(receiverAddress):
+            print("Receivers address is not valid. We do not support interdimensional transactions.")
+        if not isinstance(ammountToSend, float):
+            print("ammountToSend is not a float. That is not how numbers work.")
+        coinbaseTrans = self.getCoinbaseTransaction(Wallet.getPublicFromWallet(), self.getLatestBlock().index + 1)
+        transaction = Wallet.createTransaction(receiverAddress, ammountToSend, Wallet.getPrivateFromWallet(),
+                                               self.getUnspentTxOuts(), TransactionPool.getTransactionPool())
+        transactionList = [coinbaseTrans, transaction]
+        return self.generateRawNextBlock(transactionList)
+
 
     def findNextBlock(self, block):
         """Proof of work, finds the hash that matches the given difficulty for a block."""
@@ -140,7 +156,6 @@ class Node(implements(GenericNode),TransMethods):
             return False
         return True
 
-
     def isNewBlockValid(self, newBlock, previousBlock):
         """Checks the validity of any new block."""
         if not self.isValidBlockStructure(newBlock):
@@ -173,7 +188,7 @@ class Node(implements(GenericNode),TransMethods):
                 return True
         return False
 
-    def generateRawNextBlock(self,transactions):
+    def generateRawNextBlock(self, transactions):
         """Creates the block, fills it with supplied transactions and attempts to add it to the chain and broadcast the success."""
         newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))
         if self.addBlockToChain(newBlock):
@@ -181,7 +196,6 @@ class Node(implements(GenericNode),TransMethods):
             return newBlock
         else:
             return None
-
 
     def getDifficulty(self):
         """Calculates the current difficulty."""
