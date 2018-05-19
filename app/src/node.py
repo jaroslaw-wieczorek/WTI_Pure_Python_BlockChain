@@ -27,9 +27,9 @@ from .transactionPool import TransactionPool
 from .blockHeader import BlockHeader
 from .blockPayload import BlockPayload
 from .wallet import Wallet
-from Crypto.PublicKey import RSA
-from Crypto.Signature import PKCS1_v1_5
-from Crypto.Hash import SHA256
+from Cryptodome.PublicKey import RSA
+from Cryptodome.Signature import PKCS1_v1_5
+from Cryptodome.Hash import SHA256
 from base64 import b64encode, b64decode
 
 
