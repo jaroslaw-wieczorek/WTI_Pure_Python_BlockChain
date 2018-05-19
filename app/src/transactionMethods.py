@@ -131,7 +131,7 @@ class TransMethods():
         transIns = list(map(lambda x: x.transINs, aTransactions))
         
         #Check dupliactes 1
-        if self.hasDupliactes(transIns):
+        if self.hasDuplicates(transIns):
             return False
         
         #Check  dupliactes 2
@@ -163,7 +163,7 @@ class TransMethods():
         if self.getTransactionId(transaction) != transaction.transID :
             print('invalid coinbase tx id: ' + transaction.transID)
             return False
-        if transaction.transINs.length != 1:
+        if len(transaction.transINs) != 1:
             print('one transIn must be specified in the coinbase transaction')
             return False
 
@@ -224,14 +224,8 @@ class TransMethods():
     
     
     def getCoinbaseTransaction(self, address: str, blockIndex : int) -> Transaction:
-        t = Transaction()
-        newtransIN = TransIN()
-        newtransIN.signature = ''
-        newtransIN.transOutId = ''
-        newtransIN.transOutIndex = blockIndex
-        
-        t.transINs = [newtransIN]
-        t.transOUTs = [TransOUT(address, self.COINBASE_AMOUNT)]
+        newtransIN = TransIN('', blockIndex, '')
+        t = Transaction(None, [newtransIN], [TransOUT(address, self.COINBASE_AMOUNT)])
         t.transID = self.getTransactionId(t)
         
         return t
