@@ -122,8 +122,8 @@ class TransMethods():
             
         """
         
-        if not self.validateCoinbaseTrans(self, coinbaseTrans, blockIndex):
-            print('invalid coinbase transaction: ' + coinbaseTrans)
+        if not self.validateCoinbaseTrans(coinbaseTrans, blockIndex):
+            print('invalid coinbase transaction: ' + str(coinbaseTrans))
             return False
 
         # check for duplicate txIns. Each txIn can be included only once
