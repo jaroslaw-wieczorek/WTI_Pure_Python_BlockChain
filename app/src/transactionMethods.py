@@ -202,7 +202,7 @@ class TransMethods():
         validSignature : bool = signer.verify(newHash, transIN.signature)
         
         if not validSignature:
-            print("Invalid transIn signature: %s transId: %s address: %s" % transIn.signature, transaction.id, referencedUnTransOut.address)
+            print("Invalid transIn signature: %s transId: %s address: %s" % transIN.signature, transaction.id, referencedUnTransOut.address)
             return False
         return True
     
