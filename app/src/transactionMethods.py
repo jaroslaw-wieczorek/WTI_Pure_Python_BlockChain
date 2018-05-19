@@ -224,14 +224,8 @@ class TransMethods():
     
     
     def getCoinbaseTransaction(self, address: str, blockIndex : int) -> Transaction:
-        t = Transaction()
-        newtransIN = TransIN()
-        newtransIN.signature = ''
-        newtransIN.transOutId = ''
-        newtransIN.transOutIndex = blockIndex
-        
-        t.transINs = [newtransIN]
-        t.transOUTs = [TransOUT(address, self.COINBASE_AMOUNT)]
+        newtransIN = TransIN('', blockIndex, '')
+        t = Transaction(None, [newtransIN], [TransOUT(address, self.COINBASE_AMOUNT)])
         t.transID = self.getTransactionId(t)
         
         return t
