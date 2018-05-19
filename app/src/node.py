@@ -253,3 +253,5 @@ class Node(implements(GenericNode),TransMethods):
         else:
             print("Received a new blockchain but it doesn't look good. In to the trash it goes")
 
+    def getOwnersUnspentTransactionOutputs(self):
+        return self.findUnspentTransOuts(self.getPublicKey(), self.getUnspentTransOuts()) #TO_DO import findUnspentTransOuts from wallet
