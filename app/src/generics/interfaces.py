@@ -7,8 +7,6 @@ class UI(Interface):
     
     def __init__(self, address):
         pass
-    def method(self):
-        pass
 
 
 class GenericNode(Interface):
