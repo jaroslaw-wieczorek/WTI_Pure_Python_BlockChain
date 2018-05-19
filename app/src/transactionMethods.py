@@ -302,7 +302,7 @@ class TransMethods():
      
    # def newUnspentOutTrans():
    #     return list(lambda transOut, index: self.UnspentOutTrans(t.transID, index, transOut.address, transOut.amount))
-    def processTransactions(self, aTransactions: Transaction, aUnspentOutTrans, UnspentOutTrans, blockIndex):
+    def processTransactions(self, aTransactions: Transaction, aUnspentOutTrans: UnspentOutTrans, blockIndex):
         if not self.validateBlockTransaction(aTransactions, aUnspentOutTrans, blockIndex):
             print('invalid block transaciton')
             return None
