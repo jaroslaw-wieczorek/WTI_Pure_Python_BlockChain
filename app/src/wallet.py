@@ -132,7 +132,7 @@ class Wallet(implements(UI), TransMethods):
 
 
 
-    def filterTranPoolTrans(unspentOutsTrans : UnspentOutTrans, 
+    def filterTranPoolTrans(self, unspentOutsTrans : UnspentOutTrans, 
                             transactionPool : Transaction) -> UnspentOutTrans:
         transINs : TransIN = list(itertools.flatten(map(
                 (lambda trans : trans.transINs) , transactionPool)))
@@ -155,14 +155,33 @@ class Wallet(implements(UI), TransMethods):
         return filteredTransactions
         
     
-
-
-
-
-
-
-
-
+    def toUnsignedInTrans(self, unspent:UnspentOutTrans):
+        transIN = TransIN()
+        transIN.transOutId = unspent.transOutId
+        transIN.transOutIndex = unspent.transOutIndex
+        return transIN
+        
+    def createTransaction(self, receiverAddress : str, amount : float,
+                          privateKey : str, unspentOutsTrans : list, 
+                          transPool : list) ->Transaction: 
+        print("transPool: %s", json.dumps(transPool))
+        
+        myAddress : str = self.getPublicKey(self.__privateKey)
+        myUnspentOutsTransA = list(filter((lambda uOutTrans: uOutTrans.address == myAddress), unspentOutsTrans))
+        
+        myUnspentOutsTrans  = self.filterTranPoolTrans(myUnspentOutsTransA, transPool)
+        
+        # filter from unspentOutputs such inputs that are referenced in pool
+        includedUnspentOutsTrans, leftOverAmount = self.findOutsTransForAmount(amount, myUnspentOutsTrans)
+        
+        unsignedInTrans = list(map(toUnsignedInTrans, unspentOutsTrans))  
+        
+        trans = Transaction()
+        trans.transINs = unsignedInTrans
+        trans.transOUTs = self.createOutsTrans(receiverAddress, myAddress, amount, leftOverAmount)
+        trans.transID = self.getTransactionId(trans)
+        
+        #trans.transINs = 
 
 
 
