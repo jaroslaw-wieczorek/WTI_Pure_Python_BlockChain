@@ -181,8 +181,11 @@ class Wallet(implements(UI), TransMethods):
         trans.transOUTs = self.createOutsTrans(receiverAddress, myAddress, amount, leftOverAmount)
         trans.transID = self.getTransactionId(trans)
         
-        #trans.transINs = 
-
+        for transIN in trans.transINs:
+            transIN.signature = self.signTransIN(trans, transIN.transInIndex, privateKey, unspentOutsTrans)
+            
+        return trans
+    
 
 
 
