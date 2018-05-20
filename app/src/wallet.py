@@ -97,6 +97,7 @@ class Wallet(implements(UI), TransMethods):
             balance += trans.amount
      
         return balance
+<<<<<<< HEAD
 
 
     def findUnspentOutTrans(self, ownerAddres : str, unspentOutsTrans : UnspentOutTrans):
@@ -116,6 +117,8 @@ class Wallet(implements(UI), TransMethods):
         + '. Available unspentOutsTrans: ' + json.dumps(myUnspentOutsTrans)
         raise Exception(eMsg)
         
+=======
+>>>>>>> 664743f183da14bfb680e0c6488e3ed00c4c755e
 
     def createOutsTrans(self, receiverAddress : str, myAddress : str, amount, leftOverAmount):
         outTrans1 : TransOUT = TransOUT(receiverAddress, amount)
@@ -129,7 +132,24 @@ class Wallet(implements(UI), TransMethods):
     def first_true(iterable, default=False, pred=None):
         return next(filter(pred, iterable), default)
 
+    def findUnspentOutTrans(self, ownerAddres : str, unspentOutsTrans : UnspentOutTrans):
+        return list(filter((lambda trans: trans.address == ownerAddres), unspentOutsTrans))
+    
+    
+    def findOutsTransForAmount(self, amount, myUnspentOutsTrans: UnspentOutTrans):
+        currentAmount = 0
+        includeUnspentOutTrans = []
+        for myUnspentOutTrans in myUnspentOutsTrans:
+            includeUnspentOutTrans.insert(myUnspentOutTrans)
+            currentAmount = currentAmount + myUnspentOutTrans.amount
+            if currentAmount >= amount:
+                leftOverAmount = currentAmount - amount
+                return {includeUnspentOutTrans, leftOverAmount}
+        eMsg = 'Cannot create transaction from the available unspent transaction outputs.' + ' Required amount: ' + str(amount) 
+        + '. Available unspentOutsTrans: ' 
+        raise Exception(eMsg)
 
+<<<<<<< HEAD
     def filterTranPoolTrans(unspentOutsTrans : UnspentOutTrans, 
                             transactionPool : Transaction) -> UnspentOutTrans:
         transINs : TransIN = list(itertools.flatten(map(
@@ -176,3 +196,18 @@ class Wallet(implements(UI), TransMethods):
         
         
         
+=======
+    def createOutsTrans(self, receiverAddress : str, myAddress : str, amount, leftOverAmount):
+        outTrans1 : TransOUT = TransOUT(receiverAddress, amount)
+        if leftOverAmount == 0:
+            return [outTrans1]
+        else:
+            leftOverAmount = TransOUT(myAddress, leftOverAmount)
+            return [outTrans1, leftOverAmount]
+    
+    def filterTranPoolTrans(unspentOutsTrans : UnspentOutTrans, transactionPool : Transaction) -> UnspentOutTrans:
+        transIns : TransIN = list(map((lambda trans : trans.transINs) , transactionPool))
+            
+         #   map((lambda x: x.transINs),trans)
+            
+>>>>>>> 664743f183da14bfb680e0c6488e3ed00c4c755e
