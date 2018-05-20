@@ -319,8 +319,8 @@ class TransMethods():
         return binascii.unhexlify(hexStr)
     
     
-    def getPublicKey(self):
-        publ_key = RSA.importKey(self.__pub_key) 
+    def getPublicKey(self, priv_key):
+        publ_key = RSA.importKey(priv_key).publickey().exportKey()
         return publ_key
     
     
