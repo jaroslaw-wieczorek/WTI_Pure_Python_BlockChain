@@ -15,6 +15,7 @@ from .src.node import Node
 from .src.transIN import TransIN
 from .src.transOUT import TransOUT
 from .src.transaction import Transaction
+from .src.transactionPool import TransactionPool
 from .src.unspentOutTrans import UnspentOutTrans
 from .src.blockPayload import BlockPayload
 from .src.blockHeader import BlockHeader
@@ -38,11 +39,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 # Tests
 
-#txIN = [TransIN("transOutIdIN_TransIN","transOutIndexIN_TransIN","signaureIN_TransIN"), TransIN("transOutIdIN_TransIN_2","transOutIndexIN_TransIN_2","signaureIN_TransIN_2")]
-#txOUT = [TransOUT("addresIN_TransOUT",13)]
+txIN = [TransIN("transOutIdIN_TransIN","transOutIndexIN_TransIN","signaureIN_TransIN"), TransIN("transOutIdIN_TransIN_2","transOutIndexIN_TransIN_2","signaureIN_TransIN_2")]
+txOUT = [TransOUT("addresIN_TransOUT",13)]
 
-#t = Transaction("idTransactionIN_Transaction", txIN, txOUT)
-#t2=  Transaction("idTransactionIN_Transaction", txIN, txOUT)
+t = Transaction("idTransactionIN_Transaction", txIN, txOUT)
+t2=  Transaction("idTransactionIN_Transaction", txIN, txOUT)
 #print(t)
 
 #p = BlockPayload(t)
@@ -54,9 +55,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 #b2 = Block(h,p)
 #print(b)
 
+#uT = UnspentOutTrans(txIN[0].transOutId, txIN[0].transOutIndex, "AddressIN_UnspentOutTrans", 7)
+#tp = TransactionPool()
+#tp.addToTransactionPool(t, uT)
+#tp.addToTransactionPool(t2, uT)
 
-
-#uT = [UnspentOutTrans(txIN[0].transOutId, txIN[0].transOutIndex, "AddressIN_UnspentOutTrans", 7), UnspentOutTrans(txIN[1].transOutId, txIN[1].transOutIndex, "2_AddressIN_UnspentOutTrans", 3)]
 
 n = Node()
 #print(n.calculateHash(h,p))
@@ -71,7 +74,7 @@ w = Wallet(48348)
 Wallet(23)
 #print(n.getCurrentTimestamp())
 
-
+#w.filterTranPoolTrans(uT,tp)
 
 
 def main():

@@ -21,8 +21,9 @@ from base64 import b64encode, b64decode
 class TransMethods():
     
     def __init__(self):
-        self.__key = open("rsa_keys/key", "r").read()
-        self.__pub_key = open("rsa_keys/key.pub", "r").read()
+        #self.__key = open("rsa_keys/key", "r").read()
+        #self.__pub_key = open("rsa_keys/key.pub", "r").read()
+        pass
     
     def concIN(self, x):
         """
@@ -365,11 +366,11 @@ class TransMethods():
         
     # To do: implement
     def isValidTransactionStructure(self, transaction:Transaction): 
-        if type(transaction.id) != str:
+        if type(transaction.transID) != str:
             print('transactionId missing')
             return False
         
-        if not isinstance(transaction.TransINs, list):
+        if not isinstance(transaction.transINs, list):
             print('invalid TransIns type in transaction')
             return False
         

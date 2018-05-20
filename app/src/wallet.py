@@ -7,6 +7,7 @@ from .generics.interfaces import UI
 import os
 import re
 import sys
+import json
 import hashlib
 import datetime
 import binascii
@@ -22,6 +23,12 @@ from base64 import b64encode, b64decode
 from Cryptodome import Random
 from .unspentOutTrans import UnspentOutTrans
 from .transactionMethods import TransMethods
+from .transactionPool import TransactionPool
+from .transOUT import TransOUT
+from .transIN import TransIN
+from .transaction import Transaction
+
+
 # importing data accc
 lib_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key.pem'))
 current_file_path = os.path.abspath(os.path.join(__file__))
@@ -88,7 +95,35 @@ class Wallet(implements(UI), TransMethods):
             balance += trans.amount
      
         return balance
+
+
+    def findUnspentOutTrans(self, ownerAddres : str, unspentOutsTrans : UnspentOutTrans):
+        return list(filter((lambda trans: trans.address == ownerAddres), unspentOutsTrans))
     
+    
+    def findOutsTransForAmount(self, amount, myUnspentOutsTrans: UnspentOutTrans):
+        currentAmount = 0
+        includeUnspentOutTrans = []
+        for myUnspentOutTrans in myUnspentOutsTrans:
+            includeUnspentOutTrans.insert(myUnspentOutTrans)
+            currentAmount = currentAmount + myUnspentOutTrans.amount
+            if currentAmount >= amount:
+                leftOverAmount = currentAmount - amount
+                return {includeUnspentOutTrans, leftOverAmount}
+        eMsg = 'Cannot create transaction from the available unspent transaction outputs.' + ' Required amount: ' + str(amount) 
+        + '. Available unspentOutsTrans: ' 
+        raise Exception(eMsg)
 
-
-
+    def createOutsTrans(self, receiverAddress : str, myAddress : str, amount, leftOverAmount):
+        outTrans1 : TransOUT = TransOUT(receiverAddress, amount)
+        if leftOverAmount == 0:
+            return [outTrans1]
+        else:
+            leftOverAmount = TransOUT(myAddress, leftOverAmount)
+            return [outTrans1, leftOverAmount]
+    
+    def filterTranPoolTrans(unspentOutsTrans : UnspentOutTrans, transactionPool : Transaction) -> UnspentOutTrans:
+        transIns : TransIN = list(map((lambda trans : trans.transINs) , transactionPool))
+            
+         #   map((lambda x: x.transINs),trans)
+            
