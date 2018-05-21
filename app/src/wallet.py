@@ -16,9 +16,9 @@ import itertools
 from datetime import timezone
 from functools import reduce
 
-from Cryptodome.PublicKey import RSA 
-from Cryptodome.Signature import PKCS1_v1_5 
-from Cryptodome.Hash import SHA256 
+from Cryptodome.PublicKey import RSA
+from Cryptodome.Signature import PKCS1_v1_5
+from Cryptodome.Hash import SHA256
 from base64 import b64encode, b64decode 
 
 from Cryptodome import Random
