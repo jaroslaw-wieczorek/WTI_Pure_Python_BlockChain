@@ -20,9 +20,11 @@ from base64 import b64encode, b64decode
 
 class TransMethods():
     
-    def __init__(self):
-        #self.__key = open("rsa_keys/key", "r").read()
-        #self.__pub_key = open("rsa_keys/key.pub", "r").read()
+    def __init__(self, privateFileKey):
+
+        self.__priv_key = RSA.importKey(privateFileKey) 
+        self.__pub_key = self.__priv_key.publickey().exportKey()
+        
         pass
     
     def concIN(self, x):
@@ -199,9 +201,9 @@ class TransMethods():
         # TO check ! 
         address = referencedUnTransOut.address
         
-        publ_key = RSA.importKey(address) 
+        key_to_validation = address
         
-        signer = PKCS1_v1_5.new(publ_key)
+        signer = PKCS1_v1_5.new(key_to_validation)
         newHash = SHA256.new()
         dataToVerify = (transaction.transID)
         newHash.update(dataToVerify.encode("utf-8"))
@@ -251,14 +253,14 @@ class TransMethods():
         
         referencedAddress = referencedUnspentOutTrans.address
         
-        if  self.getPublicKey(self.__privateKey) != referencedAddress:
+        if  self.__pub_key != referencedAddress:
             print('trying to sign an input with private' + ' key that does not match the address that is referenced in transIN')
             raise Exception
         
         
-        priv_key = RSA.importKey(self.__key) 
+        key_to_sign = self.__priv_key  
         
-        signer = PKCS1_v1_5.new(priv_key) 
+        signer = PKCS1_v1_5.new(key_to_sign) 
         newHash = SHA256.new()
         # It's being assumed the data is base64 encoded, so it's decoded before updating the digest 
         newHash.update(dataToSign.encode("utf-8"))
@@ -413,8 +415,8 @@ class TransMethods():
         print(dataToVerify)
         
         #public key for tests
-        publ_key = RSA.importKey(self.__pub_key) 
-        signer = PKCS1_v1_5.new(publ_key)
+        key_to_verify = self.__pub_key
+        signer = PKCS1_v1_5.new(key_to_verify)
         newHash = SHA256.new()
         
         newHash.update(dataToVerify.encode("utf-8"))

@@ -42,13 +42,15 @@ class Wallet(implements(UI), TransMethods):
     def __init__(self, address):
         # PRIVATE KEY
         self.__privateFileKey = open(lib_path, "r").read()
+     
        
         self.__privateKey = RSA.importKey(self.__privateFileKey) 
         self.__publicKey = self.getPrivateFromWallet().publickey().exportKey()
                
-        
-        #self.__pub_key = open("key.pub", "r").read()
+        TransMethods.__init__(self, self.__privateFileKey)
         super()
+        #self.__pub_key = open("key.pub", "r").read()
+       # super(TransMethods, self).__init__()
         
     def getPrivateFromWallet(self) -> str: 
         #self.__privateKey = RSA.importKey(self.__privateFileKey) 
@@ -174,7 +176,7 @@ class Wallet(implements(UI), TransMethods):
         # filter from unspentOutputs such inputs that are referenced in pool
         includedUnspentOutsTrans, leftOverAmount = self.findOutsTransForAmount(amount, myUnspentOutsTrans)
         
-        unsignedInTrans = list(map(toUnsignedInTrans, unspentOutsTrans))  
+        unsignedInTrans = list(map(self.toUnsignedInTrans, unspentOutsTrans))  
         
         trans = Transaction()
         trans.transINs = unsignedInTrans
