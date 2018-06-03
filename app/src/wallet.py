@@ -94,7 +94,7 @@ class Wallet(implements(UI), TransMethods):
     
     def getBalance(self, address : str, unspentOutTrans : UnspentOutTrans):
         balance=0
-        found_unspent_transactions = map(self.findUnspentOutTrans(address, unspentOutTrans), unspentOutTrans)
+        found_unspent_transactions = self.findUnspentOutTrans(address, unspentOutTrans)
         for trans in found_unspent_transactions:
             balance += trans.amount
      
@@ -117,7 +117,7 @@ class Wallet(implements(UI), TransMethods):
 
     def findUnspentOutTrans(self, ownerAddres : str, unspentOutsTrans : UnspentOutTrans):
         return list(filter((lambda trans: trans.address == ownerAddres), unspentOutsTrans))
-    
+
     
     def findOutsTransForAmount(self, amount, myUnspentOutsTrans: UnspentOutTrans):
         currentAmount = 0

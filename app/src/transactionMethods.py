@@ -230,13 +230,11 @@ class TransMethods():
         for uTransOut in aUnspentOutTrans:
             if uTransOut.transOutId == transOutId and uTransOut.transOutIndex == transOutIndex:
                 return uTransOut
-    
-    
+
     def getCoinbaseTransaction(self, address: str, blockIndex : int) -> Transaction:
         newtransIN = TransIN('', blockIndex, '')
         t = Transaction(None, [newtransIN], [TransOUT(address, self.COINBASE_AMOUNT)])
         t.transID = self.getTransactionId(t)
-        
         return t
     
    
@@ -269,24 +267,23 @@ class TransMethods():
         signature : str = signer.sign(newHash)
       
         return signature 
-   
-    
-    def updateUnspentOutTrans(self, aTransactions : list, aUnspentOutsTrans : UnspentOutTrans) -> UnspentOutTrans:
 
+    def updateUnspentOutTrans(self, aTransactions : list, aUnspentOutsTrans : UnspentOutTrans) -> UnspentOutTrans:
         # t - Transaction
         newUnSpentOutsTrans_elements = []
-        for t in aUnspentOutsTrans:
-            for out in t.transOUTs:
-                newUnSpentOutsTrans_elements.append(UnspentOutTrans(t.transOutId, t.transOutIndex, out.address, out.transOutIndex))
+        for t in aTransactions:
+            for index, out in enumerate(t.transOUTs):
+                newUnSpentOutsTrans_elements.append(UnspentOutTrans(t.transID, index, out.address, out.amount))
         
-        newUnSpentOutsTrans : UnspentOutTrans = reduce(operator.concat, newUnSpentOutsTrans_elements, [])
-        
-     
+        #newUnSpentOutsTrans : UnspentOutTrans = reduce(operator.concat, newUnSpentOutsTrans_elements, [])
+        newUnSpentOutsTrans : UnspentOutTrans = newUnSpentOutsTrans_elements
+
+
         consumed_elements = []
         for t in aTransactions:
-            concate = map(operator.concat, t.transINs, [])
+            concate = map(lambda x: x, t.transINs)
             for transIN in concate:
-                    consumed_elements.append(self.UnspentOutTrans(transIN.transOutId, transIN.transOutIndex, '', 0))
+                    consumed_elements.append(UnspentOutTrans(transIN.transOutId, transIN.transOutIndex, '', 0))
     
     
         consumedOutsTrans : UnspentOutTrans = consumed_elements
