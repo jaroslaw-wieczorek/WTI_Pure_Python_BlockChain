@@ -124,9 +124,9 @@ class TransMethods():
 
         # Check  dupliactes 2
 
-        if len({tuple(*transIns)}) != len(set({tuple(*transIns)})):
-            raise ValueError("Some duplicate transIN")
-            return False
+        # if len(transIns) != len(set(tuple ((a) for a in transIns))):
+        #    raise ValueError("Some duplicate transIN")
+        #    return False
 
         # all but coinbase transactions
         normalTransactions = aTransactions[1:]
@@ -134,18 +134,21 @@ class TransMethods():
                       list(map(lambda x: self.validateTransaction(x, aUnspentOutTrans), normalTransactions)), True)
 
     # NEED CHANGE TO CHEK ON KEYS
-    def hasDuplicates(self, transIns: TransIN) -> bool:
-        transIns2 = {tuple(*transIns)}
-        seen = set(transIns2)
-        seen2 = set()
-
-        for x in {tuple(*transIns)}:
-            if x not in seen2:
-                seen2.add(x)
-            else:
-                return True
+    def hasDuplicates(self, transactions: list) -> bool:
+        setTrans = set()
+        listTrans = list()
+        for transIns in transactions:
+            for trans in transIns:
+                if trans in setTrans:
+                    return True
+                setTrans.add(trans)
+                listTrans.append(trans)
+                
+        if len(setTrans) != len(listTrans):
+            return True
+                
         return False
-
+        
     def validateCoinbaseTrans(self, transaction, blockIndex):
         if transaction == None:
             raise ValueError('the first transaction in the block must be coinbase transaction')
@@ -269,7 +272,7 @@ class TransMethods():
         # UnspentOutTrans as uto
         resultingUnspnetOutsTrans_all = []
         for uto in aUnspentOutsTrans:
-            if not self.findUnspentOutTrans(uto.trasOutId, uto.trasOutIndex, consumedOutsTrans):
+            if not self.findUnspentOutTrans(uto.transOutId, uto.transOutIndex, consumedOutsTrans):
                 resultingUnspnetOutsTrans_all.append(uto)
 
         resultingUnspnetOutsTrans = reduce(operator.concat, resultingUnspnetOutsTrans_all, newUnSpentOutsTrans)
