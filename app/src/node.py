@@ -10,6 +10,8 @@ import datetime
 from datetime import timezone
 import hashlib
 from functools import reduce
+
+import os
 from interface import implements
 from copy import deepcopy
 
@@ -44,9 +46,13 @@ class Node(implements(GenericNode),TransMethods):
     DIFFICULTY_ADJUSTMENT_INTERVAL = 10
     #How much do you get for finding a block
     COINBASE_AMOUNT = 50
+    pubfirst_path = os.path.abspath(os.path.join(__file__, '..', '..', 'rsa_keys/FirstPUB.pub'))
 
     def __init__(self):
-        self.first_transaction = self.getCoinbaseTransaction("b'-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0FPqri0cb2JZf\nXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/\n3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB\nAoGAFijko56+qGyN8M0RVyaRAXz++xTqHBLh3tx4VgMtrQ+WEgCjhoTwo23KMBAu\nJGSYnRmoBZM3lMfTKevIkAidPExvYCdm5dYq3XToLkkLv5L2pIIVOFMDG+KESnAF\nV7l2c+cnzRMW0+b6f8mR1CJzZuxVLL6Q02fvLi55/mbSYxECQQDeAw6fiIQXGukB\nI4eMZZt4nscy2o12KyYner3VpoeE+Np2q+Z3pvAMd/aNzQ/W9WaI+NRfcxUJrmfP\nwIGm63ilAkEAxCL5HQb2bQr4ByorcMWm/hEP2MZzROV73yF41hPsRC9m66KrheO9\nHPTJuo3/9s5p+sqGxOlFL0NDt4SkosjgGwJAFklyR1uZ/wPJjj611cdBcztlPdqo\nxssQGnh85BzCj/u3WqBpE2vjvyyvyI5kX6zk7S0ljKtt2jny2+00VsBerQJBAJGC\n1Mg5Oydo5NwD6BiROrPxGo2bpTbu/fhrT8ebHkTz2eplU9VQQSQzY1oZMVX8i1m5\nWUTLPz2yLJIBQVdXqhMCQBGoiuSoSjafUhV7i1cEGpb88h5NBYZzWXGZ37sJ5QsW\n+sJyoNde3xH8vdXhzU7eT82D6X/scw9RZz+/6rCJ4p0=\n-----END RSA PRIVATE KEY-----'",
+        self.__firstpublicFileKey = open(self.pubfirst_path, "r").read()
+        self.__firstpublicKey = RSA.importKey(self.__firstpublicFileKey)
+
+        self.first_transaction = self.getCoinbaseTransaction(self.__firstpublicKey.exportKey(),
                                                              0)
         self.first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0),
                                  BlockPayload([self.first_transaction]))
