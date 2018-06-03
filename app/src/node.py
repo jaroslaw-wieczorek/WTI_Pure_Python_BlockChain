@@ -46,12 +46,11 @@ class Node(implements(GenericNode),TransMethods):
     COINBASE_AMOUNT = 50
 
     def __init__(self):
-        self.first_transaction = self.getCoinbaseTransaction("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCzQAJ6HqLqWEDv2J5q1Jbn8+6clj5v24fI+U6WwtBqkmeJz6+Hz8NzWLrxd/uXJpxw+zj2D0zsXAhC7MRnwP+O+Q+oMfHCtC1pG+9DR9s2Ce3JU6/GP9H/jGhB3X8QwCoR6oUBoQXe/anLDaYB/6hxshKx6G7YmWFm3FGFvgzdMwIDAQAB",
+        self.first_transaction = self.getCoinbaseTransaction("b'-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQCqGKukO1De7zhZj6+H0qtjTkVxwTCpvKe4eCZ0FPqri0cb2JZf\nXJ/DgYSF6vUpwmJG8wVQZKjeGcjDOL5UlsuusFncCzWBQ7RKNUSesmQRMSGkVb1/\n3j+skZ6UtW+5u09lHNsj6tQ51s1SPrCBkedbNf0Tp0GbMJDyR4e9T04ZZwIDAQAB\nAoGAFijko56+qGyN8M0RVyaRAXz++xTqHBLh3tx4VgMtrQ+WEgCjhoTwo23KMBAu\nJGSYnRmoBZM3lMfTKevIkAidPExvYCdm5dYq3XToLkkLv5L2pIIVOFMDG+KESnAF\nV7l2c+cnzRMW0+b6f8mR1CJzZuxVLL6Q02fvLi55/mbSYxECQQDeAw6fiIQXGukB\nI4eMZZt4nscy2o12KyYner3VpoeE+Np2q+Z3pvAMd/aNzQ/W9WaI+NRfcxUJrmfP\nwIGm63ilAkEAxCL5HQb2bQr4ByorcMWm/hEP2MZzROV73yF41hPsRC9m66KrheO9\nHPTJuo3/9s5p+sqGxOlFL0NDt4SkosjgGwJAFklyR1uZ/wPJjj611cdBcztlPdqo\nxssQGnh85BzCj/u3WqBpE2vjvyyvyI5kX6zk7S0ljKtt2jny2+00VsBerQJBAJGC\n1Mg5Oydo5NwD6BiROrPxGo2bpTbu/fhrT8ebHkTz2eplU9VQQSQzY1oZMVX8i1m5\nWUTLPz2yLJIBQVdXqhMCQBGoiuSoSjafUhV7i1cEGpb88h5NBYZzWXGZ37sJ5QsW\n+sJyoNde3xH8vdXhzU7eT82D6X/scw9RZz+/6rCJ4p0=\n-----END RSA PRIVATE KEY-----'",
                                                              0)
         self.first_block = Block(BlockHeader(0, "May your spirit be always backed by enough firepower.", 00000000, 0, 0),
                                  BlockPayload([self.first_transaction]))
         self.first_block.currentHash = self.calculateHash(self.first_block.blockHeader, self.first_block.blockPayload)
-        print(self.first_block.currentHash)
         self.blockchain = [self.first_block]
         self.unspentTransOuts = self.processTransactions(self.blockchain[0].blockPayload.data, [], 0)
 

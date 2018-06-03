@@ -8,13 +8,14 @@ Created on Thu Mar 22 11:38:34 2018
 
 import sys
 sys.path += ['./ src/']
-
+import json
 import unittest
 import hashlib
 
 
 
 from app.src.wallet import Wallet
+from app.src.node import Node
 
 
 
@@ -41,7 +42,10 @@ def tests():
 
 def main():
     print("Untitled Coin")
+    n = Node()
     w = Wallet(48348)
+    unspent = n.getUnspentTransOuts()
+    print(w.getBalance(w.getPublicFromWallet(), unspent))
 
 
 if __name__ == "__main__":
