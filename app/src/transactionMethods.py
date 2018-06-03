@@ -19,10 +19,9 @@ from base64 import b64encode, b64decode
 
 
 class TransMethods():
-    def __init__(self, privateFileKey):
+    def __init__(self):
 
-        self.__priv_key = RSA.importKey(privateFileKey)
-        self.__pub_key = self.__priv_key.publickey().exportKey()
+
 
         pass
 
@@ -77,21 +76,15 @@ class TransMethods():
             return False
 
         if self.getTransactionId(transaction) != transaction.transID:
-            print("[*] Invalid tx id: " + transaction.transID)
+            raise ValueError("[*] Invalid tx id: " + transaction.transID)
             return False
 
         # Two lambda functions labda x,y, x and y  - prepare logic values to reduce
         # Next lambda preprare list fo first with results of validateTransIN    
-        hasValidInTrans: bool = reduce(lambda x, y: x and y,
-                                       list(map(lambda transIN:
-                                                self.validateTransIN(transIN,
-                                                                     transaction,
-                                                                     aUnspentOutTrans),
-                                                transaction.transINs,
-                                                default=True)))
+        hasValidInTrans: bool = reduce(lambda x, y: x and y, list(map(lambda transIN: self.validateInTrans(transIN, transaction, aUnspentOutTrans), transaction.transINs)))
 
         if not hasValidInTrans:
-            print('[*] some of the transINs are invalid in trans: ' + transaction.transID)
+            raise ValueError('[*] some of the transINs are invalid in trans: ' + transaction.transID)
             return False
 
         # get all InMoney
@@ -104,8 +97,10 @@ class TransMethods():
 
         # check 
         if totalOutTransValues != totalInTransValues:
-            print('totalOutTransValues != totalInTransValues in tx: ' + transaction.transID)
-        return False
+            raise ValueError('totalOutTransValues != totalInTransValues in tx: ' + transaction.transID)
+            return False
+
+        return True
 
     def validateBlockTransactions(self, aTransactions, aUnspentOutTrans: UnspentOutTrans, blockIndex: float):
         coinbaseTrans = aTransactions[0]
@@ -116,7 +111,7 @@ class TransMethods():
         """
 
         if not self.validateCoinbaseTrans(coinbaseTrans, blockIndex):
-            print('invalid coinbase transaction: ' + str(coinbaseTrans))
+            raise ValueError('invalid coinbase transaction: ' + str(coinbaseTrans))
             return False
 
         # check for duplicate txIns. Each txIn can be included only once
@@ -130,7 +125,7 @@ class TransMethods():
         # Check  dupliactes 2
 
         if len({tuple(*transIns)}) != len(set({tuple(*transIns)})):
-            print("Some duplicate transIN")
+            raise ValueError("Some duplicate transIN")
             return False
 
         # all but coinbase transactions
@@ -153,41 +148,45 @@ class TransMethods():
 
     def validateCoinbaseTrans(self, transaction, blockIndex):
         if transaction == None:
-            print('the first transaction in the block must be coinbase transaction')
+            raise ValueError('the first transaction in the block must be coinbase transaction')
             return False
 
         if self.getTransactionId(transaction) != transaction.transID:
-            print('invalid coinbase tx id: ' + transaction.transID)
+            raise ValueError('invalid coinbase tx id: ' + transaction.transID)
             return False
         if len(transaction.transINs) != 1:
-            print('one transIn must be specified in the coinbase transaction')
+            raise ValueError('one transIn must be specified in the coinbase transaction')
             return False
 
         if transaction.transINs[0].transOutIndex != blockIndex:
-            print('the txIn signature in coinbase tx must be the block height')
+            raise ValueError('the txIn signature in coinbase tx must be the block height')
             return False
 
         if len(transaction.transOUTs) != 1:
-            print('invalid number of transOut in coinbase transaction')
+            raise ValueError('invalid number of transOut in coinbase transaction')
             return False
 
         if transaction.transOUTs[0].amount != self.COINBASE_AMOUNT:
-            print('invalid coinbase amount in coinbase transaction')
+            raise ValueError('invalid coinbase amount in coinbase transaction')
             return False
         return True
 
     def validateInTrans(self, transIN: TransIN, transaction: Transaction, aUnspentOutTrans: UnspentOutTrans) -> bool:
-        referencedUnTransOut: UnspentOutTrans = aUnspentOutTrans.find([lambda
-                                                                           uTransOut: uTransOut in uTransOut.transOutId == transIN.transOutId and uTransOut.transOutIndex == transIN.transOutIndex])
-
+        referencedUnTransOut: UnspentOutTrans = list(map(lambda uTransOut: uTransOut if uTransOut.transOutId == transIN.transOutId and uTransOut.transOutIndex == transIN.transOutIndex else None, aUnspentOutTrans))
+        for uTransOut in referencedUnTransOut:
+            if uTransOut.transOutId == transIN.transOutId and uTransOut.transOutIndex == transIN.transOutIndex:
+                referencedUnTransOut = uTransOut
+                break
+            else:
+                referencedUnTransOut = None
         if referencedUnTransOut == None:
-            print('[*] referenced transOut not found: ' + str(transIN))
+            raise ValueError('[*] referenced transOut not found: ' + str(transIN))
             return False
 
         # TO check ! 
         address = referencedUnTransOut.address
 
-        key_to_validation = address
+        key_to_validation = RSA.importKey(address)
 
         signer = PKCS1_v1_5.new(key_to_validation)
         newHash = SHA256.new()
@@ -197,7 +196,7 @@ class TransMethods():
         validSignature: bool = signer.verify(newHash, transIN.signature)
 
         if not validSignature:
-            print("Invalid transIn signature: %s transId: %s address: %s" % transIN.signature, transaction.id,
+            raise ValueError("Invalid transIn signature: %s transId: %s address: %s" % transIN.signature, transaction.id,
                   referencedUnTransOut.address)
             return False
         return True
@@ -219,7 +218,7 @@ class TransMethods():
         t.transID = self.getTransactionId(t)
         return t
 
-    def signTransIN(self, transaction: Transaction, transInIndex: int, aUnspentOutTrans: UnspentOutTrans):
+    def signTransIN(self, transaction: Transaction, transInIndex: int, aUnspentOutTrans: UnspentOutTrans, privkey):
 
         transIN: TransIN = transaction.transINs[transInIndex]
         dataToSign = str(transaction.transID)
@@ -231,12 +230,12 @@ class TransMethods():
 
         referencedAddress = referencedUnspentOutTrans.address
 
-        if self.__pub_key != referencedAddress:
+        if privkey.publickey().exportKey() != referencedAddress:
             print(
                 'trying to sign an input with private' + ' key that does not match the address that is referenced in transIN')
             raise Exception
 
-        key_to_sign = self.__priv_key
+        key_to_sign = privkey
 
         signer = PKCS1_v1_5.new(key_to_sign)
         newHash = SHA256.new()
@@ -299,38 +298,38 @@ class TransMethods():
 
     def isValidInTransStructure(self, transIN: TransIN) -> bool:
         if transIN == None:
-            print('transIN is None')
+            raise ValueError('transIN is None')
             return False
 
-        elif type(transIN.signature) != str:
-            print('invalid singature type in transIN')
+        elif type(transIN.signature) != bytes:
+            raise ValueError('invalid singature type in transIN')
             return False
 
         elif type(transIN.transOutId) != str:
-            print('invalid transOutId type in transIN')
+            raise ValueError('invalid transOutId type in transIN')
             return False
 
         elif type(transIN.transOutIndex) != int:
-            print('invalid transOutIndex type in transIN')
+            raise ValueError('invalid transOutIndex type in transIN')
             return False
         else:
             return True
 
     def isValidOutTransStructure(self, transOUT: TransOUT) -> bool:
         if transOUT == None:
-            print('transOUT is None')
+            raise ValueError('transOUT is None')
             return False
 
-        elif type(transOUT.address) != str:
-            print('invalid address type in transOUT')
+        elif type(transOUT.address) != bytes:
+            raise ValueError('invalid address type in transOUT')
             return False
 
         elif not self.isValidAddress(transOUT.address):
-            print('not valid transOUT address')
+            raise ValueError('not valid transOUT address')
             return False
 
         elif type(transOUT.amount) != int:
-            print('invalid amount type in transOUT')
+            raise ValueError('invalid amount type in transOUT')
             return False
 
         else:
@@ -339,43 +338,43 @@ class TransMethods():
     # To do: implement
     def isValidTransactionStructure(self, transaction: Transaction):
         if type(transaction.transID) != str:
-            print('transactionId missing')
+            raise ValueError('transactionId missing')
             return False
 
         if not isinstance(transaction.transINs, list):
-            print('invalid TransIns type in transaction')
+            raise ValueError('invalid TransIns type in transaction')
             return False
 
             # validation structures in transaction.transINs
         if not reduce(lambda x, y: x and y, map(self.isValidInTransStructure,
                                                 transaction.transINs), True):
-            print('invalid some structure in transactionINs')
+            raise ValueError('invalid some structure in transactionINs')
             return False
 
         # validation type - expected list for input transaction.transOUTs
         if not isinstance(transaction.transOUTs, list):
-            print('invalid transOUTs type in transaction')
+            raise ValueError('invalid transOUTs type in transaction')
             return False
 
         # validation structures in transaction.transOUTs
         if not reduce(lambda x, y: x and y, map(self.isValidOutTransStructure,
                                                 transaction.transOUTs), True):
-            print('invalid some structure in transactionOUTs')
+            raise ValueError('invalid some structure in transactionOUTs')
             return False
 
         return True
 
     # validation Address in publicKey
     def isValidAddress(self, address: str) -> bool:
-        if len(address) != 130:
-            print(address, ' - invalid len of public key')
+        if len(address) != 271:
+            raise ValueError(address, ' - invalid len of public key')
             return False
-        elif re.match(r"^[a-fA-F0-9]+$", address) == None:
-            print('public key must contain only hex characters')
+        #elif re.match(r"^[a-fA-F0-9]+$", address) is None:
+        #    raise ValueError('public key must contain only hex characters')
             return False
-        elif address.startswith("04"):
-            print('public key must start with 04')
-            return False
+        #elif address.startswith("04"):
+        #    raise ValueError('public key must start with 04')
+        #   return False
         else:
             return True
 

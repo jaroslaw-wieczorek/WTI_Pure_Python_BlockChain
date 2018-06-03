@@ -16,6 +16,7 @@ import hashlib
 
 from app.src.wallet import Wallet
 from app.src.node import Node
+from app.src.transactionPool import TransactionPool
 
 
 
@@ -42,14 +43,19 @@ def tests():
 
 def main():
     print("Untitled Coin")
-    n = Node()
+    pool = TransactionPool()
     w0 = Wallet(48348)
     w1 = Wallet("1")
+    n = Node(w0, pool)
+
     print("wallet1")
     print(w1.getBalance(w1.getPublicFromWallet(), n.getUnspentTransOuts()))
     print("wallet0")
     print(w0.getBalance(w0.getPublicFromWallet(), n.getUnspentTransOuts()))
-    w0.createTransaction(w1.getPublicFromWallet(), 50, w0.getPrivateFromWallet(), n.getUnspentTransOuts(),[])
+    trans = w0.createTransaction(w1.getPublicFromWallet(), 50, w0.getPrivateFromWallet(), n.getUnspentTransOuts(),[])
+    pool.addToTransactionPool(trans, n.getUnspentTransOuts())
+    n.generateNextBlock()
+    print(n.getBlockchain())
 
 
 if __name__ == "__main__":

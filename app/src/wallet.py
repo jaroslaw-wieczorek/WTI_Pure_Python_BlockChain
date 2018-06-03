@@ -57,7 +57,7 @@ class Wallet(implements(UI), TransMethods):
         self.__privateKey = RSA.importKey(self.__privateFileKey)
         self.__publicKey = RSA.importKey(self.__publicFileKey)
                
-        TransMethods.__init__(self, self.__privateFileKey)
+#        TransMethods.__init__(self, self.__privateFileKey)
         super()
         #self.__pub_key = open("key.pub", "r").read()
        # super(TransMethods, self).__init__()
@@ -150,7 +150,7 @@ class Wallet(implements(UI), TransMethods):
             if currentAmount >= amount:
                 leftOverAmount = currentAmount - amount
                 return includeUnspentOutTrans, leftOverAmount
-        eMsg = "Cannot create transaction from the available unspent transaction outputs." + " Required amount: " + str(amount) + ". Available unspentOutsTrans: " + json.dumps(myUnspentOutsTrans)
+        eMsg = "Cannot create transaction from the available unspent transaction outputs." #+ " Required amount: " + str(amount) + ". Available unspentOutsTrans: " + json.dumps(myUnspentOutsTrans)
         raise Exception(eMsg)
 
     def flatten(self, listOfLists):
@@ -201,7 +201,7 @@ class Wallet(implements(UI), TransMethods):
         trans.transID = self.getTransactionId(trans)
         
         for index, transIN in enumerate(trans.transINs):
-            transIN.signature = self.signTransIN(trans, index, unspentOutsTrans)
+            transIN.signature = self.signTransIN(trans, index, unspentOutsTrans, self.__privateKey)
             
         return trans
     

@@ -10,7 +10,7 @@ class UI(Interface):
 
 
 class GenericNode(Interface):
-    def __init__(self):
+    def __init__(self, wallet, transpool):
         pass
 
 

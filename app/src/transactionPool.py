@@ -54,12 +54,16 @@ class TransactionPool(TransMethods):
 
     def containsTransIn(self, transIns,transIn):
         """Returns the transaction if it exists in the list."""
-        return [x for x in transIns if x.transOutId == transIn.transOutId and x.transOutIndex == transIn.transOutIndex][0]
+        trans = [x for x in transIns if x.transOutId == transIn.transOutId and x.transOutIndex == transIn.transOutIndex]
+        if len(trans) > 0:
+            return trans
+        else:
+            return []
 
     def isValidTransForPool(self, trans, xTransactionPool):
         """Checks if the transaction is not a duplicate of an already existing transaction in the Pool."""
         transPoolIns = self.getTransactionPoolIns(xTransactionPool)
-        for transIn in trans.transIN:
+        for transIn in trans.transINs:
             if self.containsTransIn(transPoolIns, transIn):
                 print("TransactionIn already exists in the Pool.")
                 return False

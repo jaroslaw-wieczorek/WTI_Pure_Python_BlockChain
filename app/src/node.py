@@ -48,7 +48,9 @@ class Node(implements(GenericNode),TransMethods):
     COINBASE_AMOUNT = 50
     pubfirst_path = os.path.abspath(os.path.join(__file__, '..', '..', 'rsa_keys/FirstPUB.pub'))
 
-    def __init__(self):
+    def __init__(self, wallet, transpool):
+        self.wallet = wallet
+        self.transpoll = transpool
         self.__firstpublicFileKey = open(self.pubfirst_path, "r").read()
         self.__firstpublicKey = RSA.importKey(self.__firstpublicFileKey)
 
@@ -91,9 +93,9 @@ class Node(implements(GenericNode),TransMethods):
         previousBlock = self.getLatestBlock()
         difficulty = self.getDifficulty()
         nonce = 0
-        nextIndex = previousBlock.index + 1
+        nextIndex = previousBlock.blockHeader.index + 1
         nextTimestamp = self.getCurrentTimestamp()
-        newBlockHeader = BlockHeader(nextIndex, previousBlock.hash, nextTimestamp, difficulty, nonce)
+        newBlockHeader = BlockHeader(nextIndex, previousBlock.currentHash, nextTimestamp, difficulty, nonce)
         return newBlockHeader
 
     def generateNextBlockPayload(self, transactions):
@@ -108,9 +110,9 @@ class Node(implements(GenericNode),TransMethods):
             print("Receivers address is not valid. We do not support interdimensional transactions.")
         if not isinstance(ammountToSend, float):
             print("ammountToSend is not a float. That is not how numbers work.")
-        coinbaseTrans = self.getCoinbaseTransaction(Wallet.getPublicFromWallet(), self.getLatestBlock().index + 1)
-        transaction = Wallet.createTransaction(receiverAddress, ammountToSend, Wallet.getPrivateFromWallet(),
-                                               self.getUnspentTxOuts(), TransactionPool.getTransactionPool())
+        coinbaseTrans = self.getCoinbaseTransaction(self.wallet.getPublicFromWallet(), self.getLatestBlock().index + 1)
+        transaction = self.wallet.createTransaction(receiverAddress, ammountToSend, self.wallet.getPrivateFromWallet(),
+                                               self.getUnspentTxOuts(), self.transpoll.getTransactionPool())
         transactionList = [coinbaseTrans, transaction]
         return self.generateRawNextBlock(transactionList)
 
@@ -145,7 +147,7 @@ class Node(implements(GenericNode),TransMethods):
 
     def isTimestampValid(self, newBlock, previousBlock):
         """Checks if the Timestamp is within the specified time"""
-        return previousBlock.blockHeader.timestamp - 60 < newBlock.blockHeader.timestamp &\
+        return previousBlock.blockHeader.timestamp - 60 < newBlock.blockHeader.timestamp and\
                 newBlock.blockHeader.timestamp - 60 < self.getCurrentTimestamp()
 
     def hashMatchesBlockContent(self, block):
@@ -183,14 +185,14 @@ class Node(implements(GenericNode),TransMethods):
     def addBlockToChain(self, newBlock):
         """Attempts to add a supplied block to the chain. Checks the necessary requirements, processes transactions, sets UnspentTXOuts and updates the Pool."""
         if self.isNewBlockValid(newBlock, self.getLatestBlock()):
-            unspentOuts = self.processTransactions(newBlock.data, self.getUnspentTransOuts(), newBlock.index)
+            unspentOuts = self.processTransactions(newBlock.blockPayload.data, self.getUnspentTransOuts(), newBlock.blockHeader.index)
             if  unspentOuts == None:
                 print("Block transactions are not valid.")
                 return False
             else:
                 self.blockchain.append(newBlock)
                 self.setUnspentTransOuts(unspentOuts)
-                TransactionPool.updateTransactionPool(self.unspentTransOuts)
+                self.transpoll.updateTransactionPool(self.unspentTransOuts)
                 return True
         return False
 
@@ -198,18 +200,18 @@ class Node(implements(GenericNode),TransMethods):
         """Creates the block, fills it with supplied transactions and attempts to add it to the chain and broadcast the success."""
         newBlock = self.findNextBlock(Block(self.generateNextBlockHeader(), self.generateNextBlockPayload(transactions)))
         if self.addBlockToChain(newBlock):
-            self.broadcastLatest() #TODO not implemented
+            #self.broadcastLatest() #TODO not implemented
             return newBlock
         else:
             return None
 
     def getDifficulty(self):
         """Calculates the current difficulty."""
-        latestBlock= self.blockchain[-1]
-        if latestBlock.index % self.DIFFICULTY_ADJUSTMENT_INTERVAL == 0 & isinstance(int,latestBlock.index % self.DIFFICULTY_ADJUSTMENT_INTERVAL) & isinstance(int,latestBlock.index) & latestBlock.index != 0:
+        latestBlock = self.blockchain[-1]
+        if len(self.blockchain) - 1 % self.DIFFICULTY_ADJUSTMENT_INTERVAL == 0 and len(self.blockchain) - 1 != 0:
             return self.getAdjustedDifficulty(latestBlock)
         else:
-            return latestBlock.difficulty
+            return latestBlock.blockHeader.difficulty
 
     def getAdjustedDifficulty(self, latestBlock):
         """Adjusts the difficulty if necessary based on the hashrate calculated from previous blocks."""
@@ -229,8 +231,8 @@ class Node(implements(GenericNode),TransMethods):
 
     def generateNextBlock(self):
         """Creates a Coinbase transaction then adds the transactions awaiting in the Transaction Pool, lastly it uses generateRawNextBlock to create the actual block."""
-        coinbaseTrans = self.getCoinbaseTransaction(Wallet.getPublicFromWallet(), self.getLatestBlock().index + 1)
-        blockData = [coinbaseTrans] + TransactionPool.getTransactionPool()
+        coinbaseTrans = self.getCoinbaseTransaction(self.wallet.getPublicFromWallet(), len(self.getBlockchain()))
+        blockData = [coinbaseTrans] + self.transpoll.getTransactionPool()
         return self.generateRawNextBlock(blockData)
 
     def validateBlockChain(self, blockchaintovalidate: []) -> []:
@@ -259,10 +261,10 @@ class Node(implements(GenericNode),TransMethods):
             print("Received a better blockchain, exchanging it for your old one for free!")
             self.blockchain = newBlocks
             self.setUnspentTransOuts(aUnspentTransOuts)
-            TransactionPool.updateTransactionPool(self.unspentTransOuts)
+            self.transpoll.updateTransactionPool(self.unspentTransOuts)
             #broadcastLatest()                       #TODO
         else:
             print("Received a new blockchain but it doesn't look good. In to the trash it goes")
 
     def getOwnersUnspentTransactionOutputs(self):
-        return Wallet.findUnspentTransOuts(Wallet.getPublicFromWallet(), self.getUnspentTransOuts()) #TODO import findUnspentTransOuts from wallet
+        return self.wallet.findUnspentTransOuts(self.wallet.getPublicFromWallet(), self.getUnspentTransOuts()) #TODO import findUnspentTransOuts from wallet
