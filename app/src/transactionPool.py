@@ -38,7 +38,7 @@ class TransactionPool(TransMethods):
 
         invalidTransactions = []
         for trans in self.transactionPool:
-            for transIn in trans.transIN:
+            for transIn in trans.transINs:
                 if not self.hasTransIn(transIn, unspentTransOut):
                     invalidTransactions.append(trans)
                     break
