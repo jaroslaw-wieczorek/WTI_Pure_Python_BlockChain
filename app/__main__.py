@@ -43,9 +43,13 @@ def tests():
 def main():
     print("Untitled Coin")
     n = Node()
-    w = Wallet(48348)
-    unspent = n.getUnspentTransOuts()
-    print(w.getBalance(w.getPublicFromWallet(), unspent))
+    w0 = Wallet(48348)
+    w1 = Wallet("1")
+    print("wallet1")
+    print(w1.getBalance(w1.getPublicFromWallet(), n.getUnspentTransOuts()))
+    print("wallet0")
+    print(w0.getBalance(w0.getPublicFromWallet(), n.getUnspentTransOuts()))
+    w0.createTransaction(w1.getPublicFromWallet(), 50, w0.getPrivateFromWallet(), n.getUnspentTransOuts(),[])
 
 
 if __name__ == "__main__":

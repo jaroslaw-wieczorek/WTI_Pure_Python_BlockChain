@@ -33,6 +33,9 @@ from .transaction import Transaction
 # importing data accc
 lib_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key.pem'))
 pub_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key.pub'))
+lib_path1 = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key1.pem'))
+pub_path1 = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key1.pub'))
+
 
 current_file_path = os.path.abspath(os.path.join(__file__))
 sys.path.append(lib_path)
@@ -43,8 +46,13 @@ class Wallet(implements(UI), TransMethods):
     
     def __init__(self, address):
         # PRIVATE KEY
-        self.__privateFileKey = open(lib_path, "r").read()
-        self.__publicFileKey = open(pub_path, "r").read()
+        if address == "1":
+            self.__privateFileKey = open(lib_path1, "r").read()
+            self.__publicFileKey = open(pub_path1, "r").read()
+
+        else:
+            self.__privateFileKey = open(lib_path, "r").read()
+            self.__publicFileKey = open(pub_path, "r").read()
 
         self.__privateKey = RSA.importKey(self.__privateFileKey)
         self.__publicKey = RSA.importKey(self.__publicFileKey)
@@ -77,7 +85,21 @@ class Wallet(implements(UI), TransMethods):
             pem.close()
         
         return str(lib_path)
-    
+
+    def generatekeypair(self, name):
+        pathpub = os.path.abspath(os.path.join(__file__, '..', '..', 'rsa_keys/'+name+'.pub'))
+        pathpriv = os.path.abspath(os.path.join(__file__, '..', '..', 'rsa_keys/'+name+'.pem'))
+
+        rng = Random.new().read
+        new_key = RSA.generate(1024, rng)
+
+        with open(pathpriv, 'wb') as pem:
+            pem.write(new_key.exportKey("PEM"))
+            pem.close()
+        with open(pathpub, 'wb') as pem:
+            pem.write(new_key.publickey().exportKey("PEM"))
+            pem.close()
+        return str(pathpub)
 
     def initWallet(self):
         if os.path.isfile(lib_path):
@@ -123,30 +145,30 @@ class Wallet(implements(UI), TransMethods):
         currentAmount = 0
         includeUnspentOutTrans = []
         for myUnspentOutTrans in myUnspentOutsTrans:
-            includeUnspentOutTrans.insert(myUnspentOutTrans)
+            includeUnspentOutTrans.append(myUnspentOutTrans)
             currentAmount = currentAmount + myUnspentOutTrans.amount
             if currentAmount >= amount:
                 leftOverAmount = currentAmount - amount
-                return {includeUnspentOutTrans, leftOverAmount}
-        eMsg = 'Cannot create transaction from the available unspent transaction outputs.' + ' Required amount: ' + str(amount) 
-        + '. Available unspentOutsTrans: ' + json.dumps(myUnspentOutsTrans)
+                return includeUnspentOutTrans, leftOverAmount
+        eMsg = "Cannot create transaction from the available unspent transaction outputs." + " Required amount: " + str(amount) + ". Available unspentOutsTrans: " + json.dumps(myUnspentOutsTrans)
         raise Exception(eMsg)
 
-
+    def flatten(self, listOfLists):
+        "Flatten one level of nesting"
+        return itertools.chain.from_iterable(listOfLists)
 
     def filterTranPoolTrans(self, unspentOutsTrans : UnspentOutTrans, 
                             transactionPool : Transaction) -> UnspentOutTrans:
-        transINs : TransIN = list(itertools.flatten(map(
-                (lambda trans : trans.transINs) , transactionPool)))
+        transINs : TransIN = list(self.flatten(map(lambda trans: trans.transINs, transactionPool)))
 
         removable : list = []
         
         for unspent in unspentOutsTrans:
-            transIN = (transINs, None, (
-                    lambda transIn: transIn.transOutId == unspent.transOutId
-                    and transIn.transOutIndex == unspent.transOutIndex
-                    ))
-            if transIN == None:
+            transIN = next((transIn for transIn in transINs if transIn.transOutId == unspent.transOutId
+                    and transIn.transOutIndex == unspent.transOutIndex), [None])
+           #transIN = map(lambda transIn: transIn.transOutId == unspent.transOutId
+           #        and transIn.transOutIndex == unspent.transOutIndex, transINs)
+            if transIN[0] == None:
                 pass
             else:
                 removable.append(unspent)
@@ -158,17 +180,14 @@ class Wallet(implements(UI), TransMethods):
         
     
     def toUnsignedInTrans(self, unspent:UnspentOutTrans):
-        transIN = TransIN()
-        transIN.transOutId = unspent.transOutId
-        transIN.transOutIndex = unspent.transOutIndex
-        return transIN
+        return TransIN(unspent.transOutId, unspent.transOutIndex, "")
         
     def createTransaction(self, receiverAddress : str, amount : float,
                           privateKey : str, unspentOutsTrans : list, 
                           transPool : list) ->Transaction: 
         print("transPool: %s", json.dumps(transPool))
         
-        myAddress : str = self.getPublicKey(self.__privateKey)
+        myAddress : str = self.getPublicFromWallet()
         myUnspentOutsTransA = list(filter((lambda uOutTrans: uOutTrans.address == myAddress), unspentOutsTrans))
         
         myUnspentOutsTrans  = self.filterTranPoolTrans(myUnspentOutsTransA, transPool)
@@ -178,13 +197,11 @@ class Wallet(implements(UI), TransMethods):
         
         unsignedInTrans = list(map(self.toUnsignedInTrans, unspentOutsTrans))  
         
-        trans = Transaction()
-        trans.transINs = unsignedInTrans
-        trans.transOUTs = self.createOutsTrans(receiverAddress, myAddress, amount, leftOverAmount)
+        trans = Transaction("", unsignedInTrans, self.createOutsTrans(receiverAddress, myAddress, amount, leftOverAmount))
         trans.transID = self.getTransactionId(trans)
         
-        for transIN in trans.transINs:
-            transIN.signature = self.signTransIN(trans, transIN.transInIndex, privateKey, unspentOutsTrans)
+        for index, transIN in enumerate(trans.transINs):
+            transIN.signature = self.signTransIN(trans, index, unspentOutsTrans)
             
         return trans
     

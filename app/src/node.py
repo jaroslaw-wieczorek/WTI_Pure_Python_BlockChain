@@ -260,7 +260,7 @@ class Node(implements(GenericNode),TransMethods):
             self.blockchain = newBlocks
             self.setUnspentTransOuts(aUnspentTransOuts)
             TransactionPool.updateTransactionPool(self.unspentTransOuts)
-            broadcastLatest()                       #TODO
+            #broadcastLatest()                       #TODO
         else:
             print("Received a new blockchain but it doesn't look good. In to the trash it goes")
 
