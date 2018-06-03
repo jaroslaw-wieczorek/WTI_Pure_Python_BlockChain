@@ -32,6 +32,8 @@ from .transaction import Transaction
 
 # importing data accc
 lib_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key.pem'))
+pub_path = os.path.abspath(os.path.join(__file__, '..','..','rsa_keys/key.pub'))
+
 current_file_path = os.path.abspath(os.path.join(__file__))
 sys.path.append(lib_path)
 sys.path.append(current_file_path)
@@ -42,24 +44,22 @@ class Wallet(implements(UI), TransMethods):
     def __init__(self, address):
         # PRIVATE KEY
         self.__privateFileKey = open(lib_path, "r").read()
-     
-       
-        self.__privateKey = RSA.importKey(self.__privateFileKey) 
-        self.__publicKey = self.getPrivateFromWallet().publickey().exportKey()
+        self.__publicFileKey = open(pub_path, "r").read()
+
+        self.__privateKey = RSA.importKey(self.__privateFileKey)
+        self.__publicKey = RSA.importKey(self.__publicFileKey)
                
         TransMethods.__init__(self, self.__privateFileKey)
         super()
         #self.__pub_key = open("key.pub", "r").read()
        # super(TransMethods, self).__init__()
         
-    def getPrivateFromWallet(self) -> str: 
-        #self.__privateKey = RSA.importKey(self.__privateFileKey) 
-        return self.__privateKey 
+    def getPrivateFromWallet(self) -> str:
+        return self.__privateKey.exportKey()
     
     
     def getPublicFromWallet(self) -> str: 
-        #self.__publKey = self.getPrivateFromWallet().publickey().exportKey()
-        return self.__publicKey
+        return self.__publicKey.exportKey()
     
     
     def generatePrivateKey(self) -> str:
