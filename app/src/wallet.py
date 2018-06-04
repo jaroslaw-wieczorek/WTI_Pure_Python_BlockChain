@@ -164,11 +164,11 @@ class Wallet(implements(UI), TransMethods):
         removable : list = []
         
         for unspent in unspentOutsTrans:
-            transIN = list(next((transIn for transIn in transINs if transIn.transOutId == unspent.transOutId
-                    and transIn.transOutIndex == unspent.transOutIndex), [None]))
+            transIN = list((transIn for transIn in transINs if transIn.transOutId == unspent.transOutId
+                    and transIn.transOutIndex == unspent.transOutIndex))
            #transIN = map(lambda transIn: transIn.transOutId == unspent.transOutId
            #        and transIn.transOutIndex == unspent.transOutIndex, transINs)
-            if transIN[0] == None:
+            if len(transIN) == 0:
                 pass
             else:
                 removable.append(unspent)

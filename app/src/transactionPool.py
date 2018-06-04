@@ -10,7 +10,7 @@ class TransactionPool(TransMethods):
 
     def getTransactionPoolIns(self, xTransactionPool):
         """Returns all transaction ins for the given TransactionPool."""
-        return list(map(lambda trans: [item for sublist in trans.transIN for item in sublist], xTransactionPool))
+        return list(map(lambda trans: [item for sublist in trans.transINs for item in sublist], xTransactionPool))
         #Fast Python flatten:
         #https://stackoverflow.com/a/952952
 
