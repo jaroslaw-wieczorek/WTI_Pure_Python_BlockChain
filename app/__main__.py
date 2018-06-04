@@ -56,8 +56,33 @@ def main():
     pool.addToTransactionPool(trans, n.getUnspentTransOuts())
     n.generateNextBlock()
     print(n.getBlockchain())
-
-
+    print("wallet1")
+    print(w1.getBalance(w1.getPublicFromWallet(), n.getUnspentTransOuts()))
+    print("wallet0")
+    print(w0.getBalance(w0.getPublicFromWallet(), n.getUnspentTransOuts()))
+    trans2 = w0.createTransaction(w1.getPublicFromWallet(), 50, w0.getPrivateFromWallet(), n.getUnspentTransOuts(),pool.getTransactionPool())
+    pool.addToTransactionPool(trans2, n.getUnspentTransOuts())
+    n.generateNextBlock()
+    print("wallet1")
+    print(w1.getBalance(w1.getPublicFromWallet(), n.getUnspentTransOuts()))
+    print("wallet0")
+    print(w0.getBalance(w0.getPublicFromWallet(), n.getUnspentTransOuts()))
+    trans3 = w0.createTransaction(w1.getPublicFromWallet(), 25, w0.getPrivateFromWallet(), n.getUnspentTransOuts(),
+    pool.getTransactionPool())
+    pool.addToTransactionPool(trans3, n.getUnspentTransOuts())
+    n.generateNextBlock()
+    print("wallet1")
+    print(w1.getBalance(w1.getPublicFromWallet(), n.getUnspentTransOuts()))
+    print("wallet0")
+    print(w0.getBalance(w0.getPublicFromWallet(), n.getUnspentTransOuts()))
+    trans4 = w0.createTransaction(w1.getPublicFromWallet(), 6.666, w0.getPrivateFromWallet(), n.getUnspentTransOuts(),
+    pool.getTransactionPool())
+    pool.addToTransactionPool(trans4, n.getUnspentTransOuts())
+    n.generateNextBlock()
+    print("wallet1")
+    print(w1.getBalance(w1.getPublicFromWallet(), n.getUnspentTransOuts()))
+    print("wallet0")
+    print(w0.getBalance(w0.getPublicFromWallet(), n.getUnspentTransOuts()))
 if __name__ == "__main__":
     main()
 

@@ -26,8 +26,8 @@ class TransactionPool(TransMethods):
 
     def hasTransIn(self, transIn, unspentTransOuts):
         """Returns True if transIn Id and Index exist in the unspentransOuts."""
-        foundTransIn = [x for x in unspentTransOuts if x.transOutId == transIn.transOutId and x.transOutIndex == transIn.transOutIndex][0]
-        if foundTransIn:   #TO_DO Verify if this works properly.
+        foundTransIn = [x for x in unspentTransOuts if x.transOutId == transIn.transOutId and x.transOutIndex == transIn.transOutIndex]
+        if len(foundTransIn)>0:   #TO_DO Verify if this works properly.
             return True
 
     def updateTransactionPool(self, unspentTransOut):

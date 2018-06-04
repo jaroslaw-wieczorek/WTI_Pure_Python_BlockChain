@@ -175,7 +175,8 @@ class TransMethods():
         return True
 
     def validateInTrans(self, transIN: TransIN, transaction: Transaction, aUnspentOutTrans: UnspentOutTrans) -> bool:
-        referencedUnTransOut: UnspentOutTrans = list(map(lambda uTransOut: uTransOut if uTransOut.transOutId == transIN.transOutId and uTransOut.transOutIndex == transIN.transOutIndex else None, aUnspentOutTrans))
+        referencedUnTransOut: UnspentOutTrans = list(map(lambda uTransOut: uTransOut if uTransOut.transOutId == transIN.transOutId and uTransOut.transOutIndex == transIN.transOutIndex else None , aUnspentOutTrans))
+        referencedUnTransOut = list(filter(lambda i: i != None, referencedUnTransOut))
         for uTransOut in referencedUnTransOut:
             if uTransOut.transOutId == transIN.transOutId and uTransOut.transOutIndex == transIN.transOutIndex:
                 referencedUnTransOut = uTransOut
@@ -228,17 +229,16 @@ class TransMethods():
         referencedUnspentOutTrans = TransMethods.findUnspentOutTrans(self, transIN.transOutId, transIN.transOutIndex, aUnspentOutTrans)
 
         if referencedUnspentOutTrans is None:
-            print("could not find referenced transOUT")
-            raise Exception
+            raise ValueError("could not find referenced transOUT")
 
+        private = RSA.importKey(privkey)
         referencedAddress = referencedUnspentOutTrans.address
+        public = private.publickey().exportKey()
+        if public != referencedAddress:
+            raise ValueError('trying to sign an input with private' + ' key that does not match the address that is referenced in transIN')
 
-        if privkey.publickey().exportKey() != referencedAddress:
-            print(
-                'trying to sign an input with private' + ' key that does not match the address that is referenced in transIN')
-            raise Exception
 
-        key_to_sign = privkey
+        key_to_sign = private
 
         signer = PKCS1_v1_5.new(key_to_sign)
         newHash = SHA256.new()
@@ -275,7 +275,7 @@ class TransMethods():
             if not self.findUnspentOutTrans(uto.transOutId, uto.transOutIndex, consumedOutsTrans):
                 resultingUnspnetOutsTrans_all.append(uto)
 
-        resultingUnspnetOutsTrans = reduce(operator.concat, resultingUnspnetOutsTrans_all, newUnSpentOutsTrans)
+        resultingUnspnetOutsTrans = operator.iadd(resultingUnspnetOutsTrans_all, newUnSpentOutsTrans)
         return resultingUnspnetOutsTrans
 
 
@@ -331,7 +331,7 @@ class TransMethods():
             raise ValueError('not valid transOUT address')
             return False
 
-        elif type(transOUT.amount) != int:
+        elif not isinstance(transOUT.amount, float) and  not isinstance(transOUT.amount, int):
             raise ValueError('invalid amount type in transOUT')
             return False
 

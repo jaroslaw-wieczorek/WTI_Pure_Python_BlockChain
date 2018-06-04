@@ -195,13 +195,13 @@ class Wallet(implements(UI), TransMethods):
         # filter from unspentOutputs such inputs that are referenced in pool
         includedUnspentOutsTrans, leftOverAmount = self.findOutsTransForAmount(amount, myUnspentOutsTrans)
         
-        unsignedInTrans = list(map(self.toUnsignedInTrans, unspentOutsTrans))  
+        unsignedInTrans = list(map(self.toUnsignedInTrans, includedUnspentOutsTrans))
         
         trans = Transaction("", unsignedInTrans, self.createOutsTrans(receiverAddress, myAddress, amount, leftOverAmount))
         trans.transID = self.getTransactionId(trans)
         
         for index, transIN in enumerate(trans.transINs):
-            transIN.signature = self.signTransIN(trans, index, unspentOutsTrans, self.__privateKey)
+            transIN.signature = self.signTransIN(trans, index, unspentOutsTrans, self.getPrivateFromWallet())
             
         return trans
     
