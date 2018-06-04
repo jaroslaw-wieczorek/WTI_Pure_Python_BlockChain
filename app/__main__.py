@@ -21,11 +21,11 @@ from app.src.transactionPool import TransactionPool
 
 
 
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QDialog
 
-from app.gui.mainwindow_ui import Ui_MainWindow
+from app.gui.mainwindow_ui import Ui_WalletDialog
 
-class MainWindow(QMainWindow, Ui_MainWindow):
+class MainWindow(QDialog, Ui_WalletDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
