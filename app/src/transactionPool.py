@@ -1,4 +1,7 @@
 from copy import deepcopy
+
+import itertools
+
 from .transactionMethods import TransMethods
 
 class TransactionPool(TransMethods):
@@ -10,7 +13,7 @@ class TransactionPool(TransMethods):
 
     def getTransactionPoolIns(self, xTransactionPool):
         """Returns all transaction ins for the given TransactionPool."""
-        return list(map(lambda trans: [item for sublist in trans.transINs for item in sublist], xTransactionPool))
+        return list(itertools.chain.from_iterable(list(map(lambda trans: trans.transINs, xTransactionPool))))
         #Fast Python flatten:
         #https://stackoverflow.com/a/952952
 
