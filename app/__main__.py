@@ -83,6 +83,17 @@ def main():
     print(w1.getBalance(w1.getPublicFromWallet(), n.getUnspentTransOuts()))
     print("wallet0")
     print(w0.getBalance(w0.getPublicFromWallet(), n.getUnspentTransOuts()))
+    trans5 = w0.createTransaction(w1.getPublicFromWallet(), 69.696969, w0.getPrivateFromWallet(), n.getUnspentTransOuts(),
+    pool.getTransactionPool())
+    pool.addToTransactionPool(trans5, n.getUnspentTransOuts())
+    trans6 = w0.createTransaction(w1.getPublicFromWallet(), 9, w0.getPrivateFromWallet(), n.getUnspentTransOuts(),
+    pool.getTransactionPool())
+    pool.addToTransactionPool(trans6, n.getUnspentTransOuts())
+    n.generateNextBlock()
+    print("wallet1")
+    print(w1.getBalance(w1.getPublicFromWallet(), n.getUnspentTransOuts()))
+    print("wallet0")
+    print(w0.getBalance(w0.getPublicFromWallet(), n.getUnspentTransOuts()))
 if __name__ == "__main__":
     main()
 

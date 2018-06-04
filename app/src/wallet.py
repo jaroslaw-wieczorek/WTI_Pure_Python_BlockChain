@@ -159,13 +159,13 @@ class Wallet(implements(UI), TransMethods):
 
     def filterTranPoolTrans(self, unspentOutsTrans : UnspentOutTrans, 
                             transactionPool : Transaction) -> UnspentOutTrans:
-        transINs : TransIN = list(self.flatten(map(lambda trans: trans.transINs, transactionPool)))
+        transINs = list(self.flatten(map(lambda trans: trans.transINs, transactionPool)))
 
         removable : list = []
         
         for unspent in unspentOutsTrans:
-            transIN = next((transIn for transIn in transINs if transIn.transOutId == unspent.transOutId
-                    and transIn.transOutIndex == unspent.transOutIndex), [None])
+            transIN = list(next((transIn for transIn in transINs if transIn.transOutId == unspent.transOutId
+                    and transIn.transOutIndex == unspent.transOutIndex), [None]))
            #transIN = map(lambda transIn: transIn.transOutId == unspent.transOutId
            #        and transIn.transOutIndex == unspent.transOutIndex, transINs)
             if transIN[0] == None:
@@ -184,9 +184,7 @@ class Wallet(implements(UI), TransMethods):
         
     def createTransaction(self, receiverAddress : str, amount : float,
                           privateKey : str, unspentOutsTrans : list, 
-                          transPool : list) ->Transaction: 
-        print("transPool: %s", json.dumps(transPool))
-        
+                          transPool : list) ->Transaction:
         myAddress : str = self.getPublicFromWallet()
         myUnspentOutsTransA = list(filter((lambda uOutTrans: uOutTrans.address == myAddress), unspentOutsTrans))
         
